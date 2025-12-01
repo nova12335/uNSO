@@ -3,196 +3,291 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bloxfall - Seu Mundo de Jogos</title>
+    <title>Bloxfall - Home</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* Estilos Globais e de Fundo */
-        body {
-            font-family: 'Source Sans Pro', Arial, sans-serif; /* Fonte similar ao estilo */
-            background-color: #f7f7f7; /* Fundo cinza claro */
-            margin: 0;
-            padding: 0;
+        /* Variáveis CSS para cores padronizadas */
+        :root {
+            --bloxfall-blue: #00a2ff;
+            --topbar-bg: #222222;
+            --sidebar-bg: #333333;
+            --main-bg: #f7f7f7;
+            --text-color: #ffffff;
+            --content-text: #4a4a4a;
         }
 
-        /* Estilo da Barra de Navegação (Topo) */
-        .navbar {
-            background-color: #000000; /* Preto para a barra */
-            color: white;
+        /* Estilos Globais */
+        body {
+            font-family: 'Source Sans Pro', Arial, sans-serif;
+            background-color: var(--main-bg);
+            margin: 0;
+            padding: 0;
+            display: flex; /* Garante que a barra lateral e o conteúdo fiquem lado a lado */
+            flex-direction: column; /* Coloca a Top Bar no topo */
+        }
+
+        /* 1. Barra Superior (Top Bar) - HEADER */
+        .topbar {
+            background-color: var(--topbar-bg);
+            color: var(--text-color);
             padding: 10px 20px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            height: 50px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
 
         .logo {
-            font-size: 28px;
-            font-weight: 800;
-            color: #ffffff;
+            font-size: 26px;
+            font-weight: 900;
+            color: var(--text-color);
             text-decoration: none;
+            margin-right: 20px;
         }
 
-        .nav-links a {
-            color: white;
-            text-decoration: none;
-            margin: 0 15px;
-            font-size: 16px;
-            font-weight: 600;
+        .search-container {
+            flex-grow: 1; /* Permite que a busca ocupe o espaço central */
+            max-width: 500px;
+            margin: 0 30px;
         }
 
-        .login-btn {
-            background-color: #00a2ff; /* Azul vibrante */
-            color: white;
+        .search-container input {
+            width: 100%;
             padding: 8px 15px;
             border: none;
             border-radius: 5px;
-            cursor: pointer;
-            font-weight: 700;
-            text-transform: uppercase;
+            background-color: #444444;
+            color: var(--text-color);
         }
 
-        /* Estilo da Seção Principal (Conteúdo) */
-        .container {
-            width: 90%;
-            max-width: 1200px;
-            margin: 20px auto;
+        .topbar-icons {
+            display: flex;
+            align-items: center;
+        }
+
+        .topbar-icons a, .topbar-icons button {
+            color: var(--text-color);
+            margin-left: 15px;
+            font-size: 20px;
+            text-decoration: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .robux-display {
+            background-color: #555555;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+
+        /* 2. Conteúdo Principal - SIDEBAR & MAIN AREA */
+        .main-wrapper {
+            display: flex;
+            flex-grow: 1; /* Ocupa o restante do espaço vertical */
+        }
+
+        /* Sidebar (Barra Lateral) */
+        .sidebar {
+            width: 250px;
+            background-color: var(--sidebar-bg);
+            padding: 20px 0;
+            color: var(--text-color);
+            min-height: calc(100vh - 70px); /* Altura total menos a altura da topbar */
+            position: sticky;
+            top: 70px; /* Alinha abaixo da topbar */
+        }
+
+        .sidebar a {
+            display: block;
+            padding: 12px 20px;
+            color: var(--text-color);
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background-color 0.2s;
+            border-left: 4px solid transparent;
+        }
+
+        .sidebar a:hover {
+            background-color: #444444;
+        }
+        
+        /* Estilo para link ativo (Home) */
+        .sidebar a.active {
+            background-color: #444444;
+            border-left: 4px solid var(--bloxfall-blue);
+        }
+
+        .sidebar i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Área Principal do Conteúdo */
+        .content-area {
+            flex-grow: 1;
             padding: 20px;
         }
 
-        .hero-section {
-            background-color: #ffffff;
-            border-radius: 8px;
-            padding: 40px;
-            text-align: center;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        .game-section {
             margin-bottom: 30px;
         }
 
-        .hero-section h1 {
-            color: #4a4a4a;
-            font-size: 36px;
-            margin-bottom: 10px;
-        }
-
-        .hero-section p {
-            color: #888888;
-            font-size: 18px;
-            margin-bottom: 20px;
-        }
-
-        .play-btn {
-            background-color: #00a2ff;
-            color: white;
-            padding: 15px 30px;
-            font-size: 20px;
+        .game-section h2 {
+            color: var(--content-text);
+            font-size: 22px;
             font-weight: 700;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            text-transform: uppercase;
-            transition: background-color 0.3s;
+            margin-bottom: 15px;
         }
 
-        .play-btn:hover {
-            background-color: #0077cc;
-        }
-
-        /* Estilo da Seção de Jogos (Thumbnails) */
-        .games-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
+        .games-list {
+            display: flex;
+            gap: 15px;
+            overflow-x: auto; /* Permite rolar horizontalmente se houver muitos jogos */
+            padding-bottom: 10px;
         }
 
         .game-card {
+            min-width: 180px;
+            max-width: 180px;
             background-color: #ffffff;
-            border-radius: 6px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
             overflow: hidden;
             text-align: center;
-            padding-bottom: 10px;
             cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .game-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
         }
 
         .game-card img {
             width: 100%;
-            height: 150px;
+            height: 120px;
             object-fit: cover;
-            background-color: #cccccc; /* Placeholder para imagem */
+            background-color: #cccccc; /* Placeholder visual */
         }
 
-        .game-card h3 {
-            font-size: 16px;
+        .game-card-info {
+            padding: 10px;
+            text-align: left;
+        }
+
+        .game-card-info h3 {
+            font-size: 15px;
             color: #333333;
-            margin: 10px 0 5px;
+            margin: 0 0 5px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
-        .game-card p {
-            font-size: 14px;
+        .game-card-info p {
+            font-size: 13px;
             color: #999999;
+            margin: 0;
         }
-
-        .game-header {
-            font-size: 24px;
-            color: #333333;
-            margin-bottom: 15px;
-            font-weight: 700;
-        }
-
     </style>
 </head>
 <body>
 
-    <div class="navbar">
+    <div class="topbar">
         <a href="#" class="logo">BLOXFALL</a>
-        <div class="nav-links">
-            <a href="#">Descobrir</a>
-            <a href="#">Avatar</a>
-            <a href="#">Criar</a>
-            <a href="#">Robux</a>
+        
+        <div class="search-container">
+            <input type="text" placeholder="Pesquisar Jogos, Pessoas..." />
         </div>
-        <div>
-            <button class="login-btn">Entrar</button>
+
+        <div class="topbar-icons">
+            <div class="robux-display">
+                <i class="fas fa-coins" style="color: yellow; margin-right: 5px;"></i>
+                999
+            </div>
+            <a href="#" title="Notificações"><i class="fas fa-bell"></i></a>
+            <a href="#" title="Mensagens"><i class="fas fa-envelope"></i></a>
+            <button title="Configurações"><i class="fas fa-cog"></i></button>
         </div>
     </div>
 
-    <div class="container">
-
-        <div class="hero-section">
-            <h1>Jogue o que Você Imaginar!</h1>
-            <p>Milhares de experiências criadas pela nossa comunidade esperam por você.</p>
-            <button class="play-btn">Jogar Agora</button>
-        </div>
-
-        <h2 class="game-header">🔥 Jogos Populares</h2>
-
-        <div class="games-grid">
-            <div class="game-card">
-                <img src="placeholder_game1.png" alt="Miniatura do Jogo">
-                <h3>Blox Race Simulator</h3>
-                <p>90.5k Jogando</p>
-            </div>
-            <div class="game-card">
-                <img src="placeholder_game2.png" alt="Miniatura do Jogo">
-                <h3>Tower of Hell</h3>
-                <p>75.2k Jogando</p>
-            </div>
-            <div class="game-card">
-                <img src="placeholder_game3.png" alt="Miniatura do Jogo">
-                <h3>Adopt Me Blox</h3>
-                <p>62.1k Jogando</p>
-            </div>
-            <div class="game-card">
-                <img src="placeholder_game4.png" alt="Miniatura do Jogo">
-                <h3>Murder Mystery X</h3>
-                <p>48.9k Jogando</p>
-            </div>
-            <div class="game-card">
-                <img src="placeholder_game5.png" alt="Miniatura do Jogo">
-                <h3>Bloxfall Tycoon</h3>
-                <p>35.4k Jogando</p>
-            </div>
-        </div>
+    <div class="main-wrapper">
         
+        <div class="sidebar">
+            <a href="#" class="active"><i class="fas fa-home"></i> Início</a>
+            <a href="#"><i class="fas fa-user-circle"></i> Perfil</a>
+            <a href="#"><i class="fas fa-comments"></i> Mensagens</a>
+            <a href="#"><i class="fas fa-users"></i> Amigos</a>
+            <a href="#"><i class="fas fa-tshirt"></i> Avatar</a>
+            <a href="#"><i class="fas fa-box-open"></i> Inventário</a>
+            <a href="#"><i class="fas fa-layer-group"></i> Criar</a>
+            <a href="#"><i class="fas fa-cog"></i> Configurações</a>
+        </div>
+
+        <div class="content-area">
+            
+            <div class="game-section">
+                <h2>Recomendado para Você</h2>
+                <div class="games-list">
+                    <div class="game-card">
+                        <img src="placeholder_img_1.png" alt="Miniatura do Jogo">
+                        <div class="game-card-info">
+                            <h3>Super Blox Tycoon 2</h3>
+                            <p>50k Jogando</p>
+                        </div>
+                    </div>
+                    <div class="game-card">
+                        <img src="placeholder_img_2.png" alt="Miniatura do Jogo">
+                        <div class="game-card-info">
+                            <h3>Bloxfall Obby Extreme</h3>
+                            <p>35k Jogando</p>
+                        </div>
+                    </div>
+                     <div class="game-card">
+                        <img src="placeholder_img_3.png" alt="Miniatura do Jogo">
+                        <div class="game-card-info">
+                            <h3>Adopt & Pet Blox</h3>
+                            <p>78k Jogando</p>
+                        </div>
+                    </div>
+                     <div class="game-card">
+                        <img src="placeholder_img_4.png" alt="Miniatura do Jogo">
+                        <div class="game-card-info">
+                            <h3>Blox Royale</h3>
+                            <p>62k Jogando</p>
+                        </div>
+                    </div>
+                     <div class="game-card">
+                        <img src="placeholder_img_5.png" alt="Miniatura do Jogo">
+                        <div class="game-card-info">
+                            <h3>Brookhaven RP</h3>
+                            <p>91k Jogando</p>
+                        </div>
+                    </div>
+                    </div>
+            </div>
+
+            <div class="game-section">
+                <h2>Mais Populares</h2>
+                <div class="games-list">
+                    <div class="game-card"><img src="placeholder_img_6.png"><div class="game-card-info"><h3>Blox Race 3D</h3><p>40k Jogando</p></div></div>
+                    <div class="game-card"><img src="placeholder_img_7.png"><div class="game-card-info"><h3>Tower of Blox</h3><p>55k Jogando</p></div></div>
+                    <div class="game-card"><img src="placeholder_img_8.png"><div class="game-card-info"><h3>Blox Combat</h3><p>28k Jogando</p></div></div>
+                </div>
+            </div>
+
+        </div>
     </div>
     
 </body>
