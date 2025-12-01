@@ -1,334 +1,298 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Drum Pad — Amen Break</title>
+  <title>50 Variants — Reload para mudar</title>
   <style>
-    :root{--bg:#0b0b0d;--card:#0f0f12;--accent:#7be3ff;--muted:#9aa0a6}
-    html,body{height:100%;margin:0;font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial}
-    body{background:linear-gradient(180deg,#030304 0%, #0b0b0d 100%);color:#e6eef3;display:flex;align-items:center;justify-content:center;padding:24px}
-    .app{width:100%;max-width:980px}
-    header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
-    h1{font-size:20px;margin:0}
-    .controls{display:flex;gap:10px;align-items:center}
-    .pad-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-    .pad{background:linear-gradient(180deg,#111214,#0b0b0d);border:1px solid rgba(255,255,255,0.04);padding:18px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-direction:column;cursor:pointer;user-select:none;transition:transform .08s, box-shadow .08s}
-    .pad:active,.pad.playing{transform:translateY(-4px);box-shadow:0 10px 30px rgba(0,0,0,0.6)}
-    .pad .label{font-weight:700;margin-top:8px;color:var(--muted);font-size:13px}
-    .small{font-size:12px;color:var(--muted)}
-    .amen-controls{margin-top:16px;background:rgba(255,255,255,0.02);padding:12px;border-radius:10px}
-    .row{display:flex;gap:8px;align-items:center}
-    input[type=range]{width:140px}
-    .file{font-size:12px}
-    footer{margin-top:18px;color:var(--muted);font-size:13px}
-    .kbd{background:#101317;padding:6px 8px;border-radius:6px;font-weight:700}
+    :root{--bg:#111;--fg:#eee;--accent:#ff6;--pad:32px}
+    html,body{height:100%;margin:0;font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
+    .wrap{min-height:100%;display:flex;align-items:center;justify-content:center;padding:var(--pad);box-sizing:border-box;transition:all .6s ease}
+    .card{max-width:1100px;width:100%;border-radius:18px;padding:28px;box-shadow:0 10px 30px rgba(0,0,0,.4);backdrop-filter: blur(6px);}
+    h1{margin:0 0 8px 0;font-size: clamp(20px, 4vw, 44px);letter-spacing:-0.02em}
+    p.lead{margin:0 0 18px 0;font-size:clamp(14px,2.2vw,18px);opacity:.92}
+    .meta{display:flex;gap:12px;flex-wrap:wrap}
+    .chip{padding:8px 12px;border-radius:999px;font-weight:600;background:rgba(255,255,255,.06)}
+    .controls{position:fixed;right:18px;bottom:18px;display:flex;gap:10px}
+    button{border:0;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:700}
+    /* small helpers used by variants */
+    .split{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:center}
+    .center{text-align:center}
+    .grid-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px}
+    .tile{padding:18px;border-radius:12px}
+    /* animated background */
+    .bg-wave{position:fixed;inset:0;z-index:-1;opacity:.28}
+    svg{display:block;width:100%;height:100%}
+    .logo{font-weight:900;letter-spacing:-.02em}
+    a.small{font-size:13px;opacity:.9}
+    /* responsive */
+    @media (max-width:720px){.split{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
-  <div class="app">
-    <header>
-      <h1>Drum Pad — click to play (Amen Break included)</h1>
-      <div class="controls">
-        <div class="small">Use keys 1–9 or clique</div>
-      </div>
-    </header>
-
-    <main>
-      <div class="pad-grid" id="pads"></div>
-
-      <div class="amen-controls" id="amenBox">
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
-          <div>
-            <strong>Amen Break (loop)</strong>
-            <div class="small">Clique play para tocar o loop. Você pode substituir por seu próprio arquivo.</div>
-          </div>
-          <div class="row">
-            <button id="amenPlayBtn">Play</button>
-            <button id="amenStopBtn">Stop</button>
-            <label class="small">Velocidade</label>
-            <input type="range" id="tempoRange" min="50" max="150" value="100"> <span id="tempoLabel">100%</span>
-          </div>
-        </div>
-
-        <div style="margin-top:10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-          <label class="file">Substituir Amen Break: <input type="file" id="amenFile" accept="audio/*"></label>
-          <button id="downloadBtn">Baixar este HTML</button>
-        </div>
-      </div>
-
-      <footer>
-        Dica: arraste áudio para cada pad para usar seus samples. Os pads também respondem às teclas 1–9.
-      </footer>
-    </main>
+  <div id="bg" class="bg-wave"></div>
+  <div id="root" class="wrap">
+    <div class="card" id="card">
+      <!-- content injected by JS -->
+    </div>
   </div>
 
-  <script>
-    // Simple Drum Pad app using WebAudio
-    const AudioContext = window.AudioContext || window.webkitAudioContext;
-    const ctx = new AudioContext();
+  <div class="controls">
+    <button id="reroll">Recarregar → nova variant</button>
+    <button id="randomName">Gerar link</button>
+  </div>
 
-    const padInfos = [
-      {name:'Kick', key:'1'},
-      {name:'Snare', key:'2'},
-      {name:'Hi-Hat Closed', key:'3'},
-      {name:'Tom', key:'4'},
-      {name:'Clap', key:'5'},
-      {name:'Perc', key:'6'},
-      {name:'Crash', key:'7'},
-      {name:'Ride', key:'8'},
-      {name:'Amen Slice', key:'9'}
-    ];
+<script>
+// 50 variants configuradas
+const variants = [];
+const palettes = [
+  ['#0f172a','#e6edf3','#7c3aed'],
+  ['#07121a','#e8fff7','#06b6d4'],
+  ['#1a1a1a','#ffeedd','#ff6b6b'],
+  ['#08120f','#dff6e9','#22c55e'],
+  ['#0b1020','#e6e9ff','#8b5cf6'],
+  ['#0f0503','#fff4e6','#ffb020'],
+  ['#041224','#e8f6ff','#06b6d4'],
+  ['#100d14','#f8eefc','#d946ef'],
+  ['#0a0f0a','#f3fff5','#10b981'],
+  ['#0f0722','#fff0f6','#fb7185']
+];
+const emojis = ['✨','⚡','🔥','🌊','🎛️','🖤','🪐','🎇','💥','🔮'];
 
-    const defaultSamples = {
-      // These are short generated sounds as fallbacks. You can replace with real samples by uploading.
-      'Kick': null,
-      'Snare': null,
-      'Hi-Hat Closed': null,
-      'Tom': null,
-      'Clap': null,
-      'Perc': null,
-      'Crash': null,
-      'Ride': null,
-      // 'Amen Slice' could be assigned to a slice of the amen break if user uploads one
-      'Amen Slice': null
-    };
+// 50 textos variados (xingando, sensual, creepy, engraçado, misterioso, etc.)
+const customTexts = [
+  'carai mano tu recarregou memo???',
+  'oxe esse é outro texto aleatório kkk',
+  'eu n aguento mais ser recarregado',
+  'me tira daqui pfvr',
+  'esse site ta vivo CONFIA',
+  'se recarregar dnv eu choro',
+  'isso daqui n era pra existir',
+  'oxe recarregou de novo né',
+  'alguém me ajuda pelo amor de deus',
+  'eu devia estar dormindo',
+  'site proibido em 47 países',
+  'clique em nada pq nada funciona',
+  'eu sou apenas um texto… triste',
+  'me recarrega mais uma vez e eu explodo',
+  'texto randômico 291817',
+  'não leia isso',
+  'variant cursed real',
+  'texto sensual: *passa a mão no código*',
+  'vc caiu no bait do reload kkk',
+  'eu gosto de café e reloads',
+  'fala tu recarregador profissional',
+  'reload é meu esporte favorito',
+  'isso aqui NÃO é um ARG… ou será?',
+  'vc desbloqueou o nivel secreto (mentira)',
+  'carai quase que quebro',
+  'texto de variant aleatória nº26',
+  'eu queria estar num site melhor',
+  'tá olhando o que?',
+  'esse texto fede',
+  'pra q recarregar 30 vezes???',
+  'ok… esse ficou bonito',
+  'variant 32 e nada muda na minha vida',
+  'reload mais rápido q minha sanidade',
+  'esse texto foi escrito às 3am',
+  'não sei mais o que escrever',
+  'bloxfall é real eu vi',
+  'ed garden n teria aprovado isso',
+  'nova supremacy',
+  'texto misterioso #39',
+  'eu sinto q tem alguém me observando',
+  'carreguei minha paciência no reload',
+  'tu recarrega mt velho',
+  'tu n cansa não?',
+  'eu cansei. pronto falei',
+  'site certificado 0% funcional',
+  'esse é o texto 45 (acho)',
+  'to só esperando vc recarregar dnv',
+  'tô ficando com tontura',
+  'variant 49 quase acabando',
+  'última variant e vc nn vai parar né'
+];
 
-    // create pads in DOM
-    const padsEl = document.getElementById('pads');
-    const pads = [];
+// small helper to create variants programmatically
+for(let i=0;i<50;i++){
+  const p = palettes[i % palettes.length];
+  // define bg, fg, accent from palette to avoid ReferenceError
+  const bg = p[0];
+  const fg = p[1];
+  const accent = p[2];
+  const layoutType = ['center','split','tiles','big-header'][i % 4];
+  variants.push({
+    id: i+1,
+    title: `Glimmer ${i+1}`,
+    subtitle: ['um pequeno experimento que muda a cada recarga','reload to see something different','aleatório. diferente. só recarrega.'][i % 3],
+    bg, fg, accent,
+    layout: layoutType,
+    accentEmoji: emojis[i % emojis.length],
+    customText: customTexts[i] || 'texto vazio'
+  });
+}
 
-    padInfos.forEach((info, i) => {
-      const el = document.createElement('div');
-      el.className = 'pad';
-      el.dataset.index = i;
-      el.innerHTML = `<div style="font-size:28px">${info.key}</div><div class="label">${info.name}</div>`;
-      padsEl.appendChild(el);
+function applyVariant(v){
+  const root = document.documentElement;
+  root.style.setProperty('--bg', v.bg);
+  root.style.setProperty('--fg', v.fg);
+  root.style.setProperty('--accent', v.accent);
+  root.style.setProperty('--pad', (20 + (v.id % 6)*6) + 'px');
+  document.body.style.background = v.bg;
+  const card = document.getElementById('card');
+  // common text color derived by mixing
+  card.style.background = 'linear-gradient(135deg, rgba(255,255,255,0.02), rgba(0,0,0,0.06))';
+  card.innerHTML = '';
 
-      // allow file drop / click
-      el.addEventListener('click', async ()=> playPad(i));
-      el.addEventListener('dragover', e=>{e.preventDefault(); el.style.opacity=0.8});
-      el.addEventListener('dragleave', e=>{el.style.opacity=''});
-      el.addEventListener('drop', async e=>{
-        e.preventDefault(); el.style.opacity='';
-        const f = e.dataTransfer.files?.[0];
-        if(f) await loadFileToPad(f, i);
-      });
+  // Build header area
+  const h = document.createElement('div');
+  h.style.display='flex';
+  h.style.justifyContent='space-between';
+  h.style.alignItems='center';
 
-      pads.push({el, buffer:null});
-    });
+  const left = document.createElement('div');
+  const title = document.createElement('h1');
+  title.className = 'logo';
+  title.textContent = `${v.accentEmoji} ${v.title}`;
+  title.style.color = v.fg;
+  left.appendChild(title);
+  const sub = document.createElement('p');
+  sub.className = 'lead';
+  sub.textContent = v.subtitle;
+  sub.style.color = v.fg;
+  left.appendChild(sub);
+  h.appendChild(left);
 
-    // key handling
-    window.addEventListener('keydown', async (ev)=>{
-      if(document.activeElement && (document.activeElement.tagName==='INPUT' || document.activeElement.tagName==='TEXTAREA')) return;
-      const k = ev.key;
-      const idx = padInfos.findIndex(p=>p.key===k);
-      if(idx>=0) { playPad(idx); }
-    });
+  const right = document.createElement('div');
+  right.className='meta';
+  const chip = document.createElement('div');
+  chip.className='chip';
+  chip.textContent = `Variant ${v.id}/50`;
+  chip.style.color = v.bg;
+  chip.style.background = v.accent;
+  right.appendChild(chip);
+  h.appendChild(right);
 
-    // generate tiny synth fallback when buffer missing
-    function playSynth(type='click'){
-      const o = ctx.createOscillator();
-      const g = ctx.createGain();
-      o.type = 'square';
-      o.frequency.value = 150;
-      g.gain.value = 0.0001;
-      o.connect(g);
-      g.connect(ctx.destination);
-      const now = ctx.currentTime;
-      g.gain.setValueAtTime(0.0001, now);
-      g.gain.exponentialRampToValueAtTime(0.3, now+0.01);
-      g.gain.exponentialRampToValueAtTime(0.0001, now+0.4);
-      o.start(now); o.stop(now+0.5);
+  card.appendChild(h);
+
+  // Layouts
+  if(v.layout==='center'){
+    const c = document.createElement('div');
+    c.className='center';
+    c.style.marginTop = '22px';
+    const big = document.createElement('p');
+    // use the custom text here
+    big.textContent = v.customText;
+    big.style.fontSize = '18px';
+    big.style.color = v.fg;
+    c.appendChild(big);
+    const btn = document.createElement('a');
+    btn.textContent = 'explorar';
+    btn.href='#';
+    btn.className='small';
+    btn.style.display='inline-block';
+    btn.style.marginTop='12px';
+    btn.style.padding='10px 14px';
+    btn.style.borderRadius='10px';
+    btn.style.background = v.accent;
+    btn.style.color = v.bg;
+    c.appendChild(btn);
+    card.appendChild(c);
+  } else if(v.layout==='split'){
+    const s = document.createElement('div');
+    s.className='split';
+    const l = document.createElement('div');
+    const r = document.createElement('div');
+    l.innerHTML = `<p style="margin-top:0;color:${v.fg}">${escapeHtml(v.customText)}</p>`;
+    r.innerHTML = `<div style="height:140px;border-radius:12px;background:linear-gradient(135deg, ${v.accent}, rgba(255,255,255,0.06));display:flex;align-items:center;justify-content:center"> <strong style="color:${v.bg}">visual</strong></div>`;
+    s.appendChild(l); s.appendChild(r);
+    card.appendChild(s);
+  } else if(v.layout==='tiles'){
+    const tiles = document.createElement('div');
+    tiles.className='grid-tiles';
+    tiles.style.marginTop='18px';
+    for(let i=0;i<6;i++){
+      const t = document.createElement('div');
+      t.className='tile';
+      t.style.background = `linear-gradient(180deg, ${v.fg}11, ${v.fg}06)`;
+      t.style.color = v.fg;
+      const snippet = truncate(v.customText, 40);
+      t.innerHTML = `<strong>item ${i+1}</strong><div style='opacity:.8;font-size:13px'>${escapeHtml(snippet)}</div>`;
+      tiles.appendChild(t);
     }
+    card.appendChild(tiles);
+  } else { // big-header
+    const big = document.createElement('div');
+    big.style.marginTop='18px';
+    big.innerHTML = `<p style='font-size:20px;margin:0;color:${v.fg}'>${escapeHtml(v.customText)}</p>`;
+    card.appendChild(big);
+  }
 
-    async function playPad(i){
-      // wake audio context on first interaction
-      if(ctx.state==='suspended') await ctx.resume();
+  // footer small
+  const ft = document.createElement('div');
+  ft.style.marginTop='18px';
+  ft.innerHTML = `<a class='small' href='#' style='color:${v.fg}'>made with ♡ — reload to switch</a>`;
+  card.appendChild(ft);
 
-      const pad = pads[i];
-      if(pad.buffer){
-        const s = ctx.createBufferSource();
-        s.buffer = pad.buffer;
-        s.connect(ctx.destination);
-        s.start();
-      } else {
-        playSynth();
-      }
+  // animated background svg
+  const bgEl = document.getElementById('bg');
+  bgEl.innerHTML = generateBgSVG(v);
+}
 
-      pad.el.classList.add('playing');
-      setTimeout(()=>pad.el.classList.remove('playing'),120);
-    }
+function generateBgSVG(v){
+  // subtle wavy SVG that uses accent
+  const accent = v.accent;
+  return `
+  <svg viewBox="0 0 800 600" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="${accent}"/><stop offset="1" stop-color="${v.fg}" stop-opacity=".12"/></linearGradient>
+      <filter id="f" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="40"/></filter>
+    </defs>
+    <rect width="100%" height="100%" fill="${v.bg}"/>
+    <g filter="url(#f)">
+      <path d="M0 300 C150 ${200 + v.id}, 350 ${420 - v.id}, 800 300 L800 600 L0 600 Z" fill="url(#g)" opacity=".7"></path>
+      <circle cx="120" cy="80" r="60" fill="${accent}" opacity=".06"></circle>
+      <circle cx="700" cy="500" r="90" fill="${v.fg}" opacity=".02"></circle>
+    </g>
+  </svg>`;
+}
 
-    async function loadFileToPad(file, index){
-      const arr = await file.arrayBuffer();
-      const buf = await ctx.decodeAudioData(arr);
-      pads[index].buffer = buf;
-      pads[index].el.querySelector('.label').textContent = file.name;
-    }
+// helper utilities
+function truncate(str, n){
+  if(!str) return '';
+  return (str.length > n) ? str.slice(0, n-1) + '…' : str;
+}
+function escapeHtml(unsafe){
+  if(!unsafe) return '';
+  return unsafe.replace(/[&<>"']/g, function(m){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#039;"}[m];
+  });
+}
 
-    // Amen break loop player
-    let amenBuffer = null;
-    let amenSource = null;
-    let amenPlaybackRate = 1;
-    const amenPlayBtn = document.getElementById('amenPlayBtn');
-    const amenStopBtn = document.getElementById('amenStopBtn');
-    const tempoRange = document.getElementById('tempoRange');
-    const tempoLabel = document.getElementById('tempoLabel');
-    const amenFile = document.getElementById('amenFile');
+// pick variant index from URL param 'v' or random
+function pickVariant(){
+  const url = new URL(location.href);
+  const vp = url.searchParams.get('v');
+  let idx = parseInt(vp);
+  if(!Number.isFinite(idx) || isNaN(idx) || idx<1 || idx>50){
+    idx = Math.floor(Math.random()*variants.length)+1;
+  }
+  return variants[idx-1];
+}
 
-    // Default Amen (base64 embutido)
-    const AMEN_BASE64 = "data:audio/ogg;base64,T2dnUwACAAAAAAAAAADp0WgqAAAAABAnHnYBE09nZ1MAAAAAAAAAAAAA6dFoKgEAAAAgJx52AUtPZ2dTAAAAAAAAAAAAAOnRaCoCAAAAEAcedgHvT2dnUwAAAAAAAAAAAADp0WgqAwAAABAnHnYBzE...";
+// bind controls
+document.getElementById('reroll').addEventListener('click', ()=>{ location.reload(); });
+document.getElementById('randomName').addEventListener('click', ()=>{
+  const v = pickVariant();
+  const key = btoa(String(Date.now()+":"+v.id)).replace(/=/g,'');
+  const newUrl = location.origin + location.pathname + '?v=' + v.id + '&r=' + key;
+  navigator.clipboard.writeText(newUrl).then(()=> alert('Link copiado: ' + newUrl));
+});
 
-    async function fetchAmen(url){
-      try{
-        const res = await fetch(url);
-        if(!res.ok) throw new Error('fetch fail');
-        const arr = await res.arrayBuffer();
-        amenBuffer = await ctx.decodeAudioData(arr);
-        console.log('Amen loaded');
-      }catch(e){
-        console.warn('Falha no URL, carregando base64 embutido');
-        const res2 = await fetch(AMEN_BASE64);
-        const arr2 = await res2.arrayBuffer();
-        amenBuffer = await ctx.decodeAudioData(arr2);
-      }
-    }
+// init
+const current = pickVariant();
+applyVariant(current);
 
-    // tenta carregar direto do base64
-    fetchAmen(AMEN_BASE64)(url){
-      try{
-        const res = await fetch(url);
-        if(!res.ok) throw new Error('fetch fail');
-        const arr = await res.arrayBuffer();
-        amenBuffer = await ctx.decodeAudioData(arr);
-        console.log('Amen loaded');
-      }catch(e){
-        console.warn('Não foi possível carregar Amen pelo URL. Faça upload do seu arquivo.');
-      }
-    }
-
-    // try loading default (best effort)
-    fetchAmen(DEFAULT_AMEN_URL);
-
-    function playAmen(){
-      if(!amenBuffer) { alert('Amen break não carregado. Faça upload de um arquivo .wav/.ogg/.mp3'); return; }
-      if(ctx.state==='suspended') ctx.resume();
-      amenSource = ctx.createBufferSource();
-      amenSource.buffer = amenBuffer;
-      amenSource.loop = true;
-      amenSource.playbackRate.value = amenPlaybackRate;
-      amenSource.connect(ctx.destination);
-      amenSource.start();
-    }
-
-    function stopAmen(){
-      if(amenSource){ try{ amenSource.stop(); }catch(e){} amenSource.disconnect(); amenSource = null; }
-    }
-
-    amenPlayBtn.addEventListener('click', ()=>{ playAmen(); });
-    amenStopBtn.addEventListener('click', ()=>{ stopAmen(); });
-
-    tempoRange.addEventListener('input', ()=>{
-      const pct = Number(tempoRange.value);
-      tempoLabel.textContent = pct + '%';
-      amenPlaybackRate = pct/100;
-      if(amenSource) amenSource.playbackRate.value = amenPlaybackRate;
-    });
-
-    amenFile.addEventListener('change', async (e)=>{
-      const f = e.target.files?.[0];
-      if(!f) return;
-      const arr = await f.arrayBuffer();
-      amenBuffer = await ctx.decodeAudioData(arr);
-      alert('Amen break carregado com sucesso — clique Play.');
-    });
-
-    // permitir upload múltiplo de samples + arrastar pasta
-    const multiInput = document.createElement('input');
-    multiInput.type = 'file';
-    multiInput.accept = 'audio/*';
-    multiInput.multiple = true;
-
-    // arrastar PASTA para carregar em ordem
-    document.addEventListener('dragover', e=>{ e.preventDefault(); });
-    document.addEventListener('drop', async e=>{
-      if(!e.dataTransfer.items) return;
-      const items = e.dataTransfer.items;
-      let files = [];
-
-      // lê pasta inteira, preservando ordem
-      for(const item of items){
-        const entry = item.webkitGetAsEntry();
-        if(entry && entry.isDirectory){
-          await readDir(entry, files);
-        } else if(item.kind === 'file'){
-          const f = item.getAsFile();
-          if(f) files.push(f);
-        }
-      }
-
-      // ordena por nome da pasta
-      files.sort((a,b)=> a.name.localeCompare(b.name));
-
-      // distribui nos pads
-      for(let i=0;i<files.length && i<pads.length;i++){
-        const arr = await files[i].arrayBuffer();
-        const buf = await ctx.decodeAudioData(arr);
-        pads[i].buffer = buf;
-        pads[i].el.querySelector('.label').textContent = files[i].name;
-      }
-    });
-
-    async function readDir(entry, out){
-      const reader = entry.createReader();
-      const entries = await new Promise(r=> reader.readEntries(r));
-      for(const e of entries){
-        if(e.isDirectory) await readDir(e, out);
-        else if(e.isFile){
-          await new Promise(res=> e.file(f=>{ out.push(f); res(); }));
-        }
-      }
-    } (carrega em ordem nos pads)
-    const multiInput = document.createElement('input');
-    multiInput.type = 'file';
-    multiInput.accept = 'audio/*';
-</script> to pads via an invisible input
-    const fileInput = document.createElement('input');
-    fileInput.type='file'; fileInput.accept='audio/*'; fileInput.style.display='none';
-    document.body.appendChild(fileInput);
-    fileInput.addEventListener('change', async (e)=>{
-      const f = e.target.files?.[0];
-      if(!f) return; 
-      // find last clicked pad
-      if(typeof lastClickedPadIndex==='number') await loadFileToPad(f,lastClickedPadIndex);
-      lastClickedPadIndex = null;
-    });
-
-    let lastClickedPadIndex = null;
-    pads.forEach((p,idx)=>{
-      p.el.addEventListener('dblclick', ()=>{
-        lastClickedPadIndex = idx;
-        fileInput.click();
-      });
-    });
-
-    // download self HTML
-    document.getElementById('downloadBtn').addEventListener('click', ()=>{
-      const html = '<!doctype html>\n' + document.documentElement.outerHTML;
-      const blob = new Blob([html], {type:'text/html'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a'); a.href = url; a.download = 'drum-pad.html'; a.click();
-      URL.revokeObjectURL(url);
-    });
-
-    // small UX: clicking a pad while holding shift will prompt to upload sample
-    pads.forEach((p, i)=>{
-      p.el.addEventListener('click', (ev)=>{
-        if(ev.shiftKey){ lastClickedPadIndex = i; fileInput.click(); }
-      });
-    });
-
-  </script>
+</script>
 </body>
 </html>
