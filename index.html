@@ -177,10 +177,26 @@
     const tempoLabel = document.getElementById('tempoLabel');
     const amenFile = document.getElementById('amenFile');
 
-    // default amen break URL (may be removed by CORS or host). User can upload their own file.
-    const DEFAULT_AMEN_URL = 'https://raw.githubusercontent.com/Polytonic/amen-samples/main/amen.ogg';
+    // Default Amen (base64 embutido)
+    const AMEN_BASE64 = "data:audio/ogg;base64,T2dnUwACAAAAAAAAAADp0WgqAAAAABAnHnYBE09nZ1MAAAAAAAAAAAAA6dFoKgEAAAAgJx52AUtPZ2dTAAAAAAAAAAAAAOnRaCoCAAAAEAcedgHvT2dnUwAAAAAAAAAAAADp0WgqAwAAABAnHnYBzE...";
 
     async function fetchAmen(url){
+      try{
+        const res = await fetch(url);
+        if(!res.ok) throw new Error('fetch fail');
+        const arr = await res.arrayBuffer();
+        amenBuffer = await ctx.decodeAudioData(arr);
+        console.log('Amen loaded');
+      }catch(e){
+        console.warn('Falha no URL, carregando base64 embutido');
+        const res2 = await fetch(AMEN_BASE64);
+        const arr2 = await res2.arrayBuffer();
+        amenBuffer = await ctx.decodeAudioData(arr2);
+      }
+    }
+
+    // tenta carregar direto do base64
+    fetchAmen(AMEN_BASE64)(url){
       try{
         const res = await fetch(url);
         if(!res.ok) throw new Error('fetch fail');
@@ -228,7 +244,56 @@
       alert('Amen break carregado com sucesso — clique Play.');
     });
 
-    // allow user to assign uploaded files to pads via an invisible input
+    // permitir upload múltiplo de samples + arrastar pasta
+    const multiInput = document.createElement('input');
+    multiInput.type = 'file';
+    multiInput.accept = 'audio/*';
+    multiInput.multiple = true;
+
+    // arrastar PASTA para carregar em ordem
+    document.addEventListener('dragover', e=>{ e.preventDefault(); });
+    document.addEventListener('drop', async e=>{
+      if(!e.dataTransfer.items) return;
+      const items = e.dataTransfer.items;
+      let files = [];
+
+      // lê pasta inteira, preservando ordem
+      for(const item of items){
+        const entry = item.webkitGetAsEntry();
+        if(entry && entry.isDirectory){
+          await readDir(entry, files);
+        } else if(item.kind === 'file'){
+          const f = item.getAsFile();
+          if(f) files.push(f);
+        }
+      }
+
+      // ordena por nome da pasta
+      files.sort((a,b)=> a.name.localeCompare(b.name));
+
+      // distribui nos pads
+      for(let i=0;i<files.length && i<pads.length;i++){
+        const arr = await files[i].arrayBuffer();
+        const buf = await ctx.decodeAudioData(arr);
+        pads[i].buffer = buf;
+        pads[i].el.querySelector('.label').textContent = files[i].name;
+      }
+    });
+
+    async function readDir(entry, out){
+      const reader = entry.createReader();
+      const entries = await new Promise(r=> reader.readEntries(r));
+      for(const e of entries){
+        if(e.isDirectory) await readDir(e, out);
+        else if(e.isFile){
+          await new Promise(res=> e.file(f=>{ out.push(f); res(); }));
+        }
+      }
+    } (carrega em ordem nos pads)
+    const multiInput = document.createElement('input');
+    multiInput.type = 'file';
+    multiInput.accept = 'audio/*';
+</script> to pads via an invisible input
     const fileInput = document.createElement('input');
     fileInput.type='file'; fileInput.accept='audio/*'; fileInput.style.display='none';
     document.body.appendChild(fileInput);
