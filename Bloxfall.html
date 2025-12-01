@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bloxfall - Seu Mundo de Jogos</title>
+    <style>
+        /* Estilos Globais e de Fundo */
+        body {
+            font-family: 'Source Sans Pro', Arial, sans-serif; /* Fonte similar ao estilo */
+            background-color: #f7f7f7; /* Fundo cinza claro */
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Estilo da Barra de Navegação (Topo) */
+        .navbar {
+            background-color: #000000; /* Preto para a barra */
+            color: white;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+            color: #ffffff;
+            text-decoration: none;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .login-btn {
+            background-color: #00a2ff; /* Azul vibrante */
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        /* Estilo da Seção Principal (Conteúdo) */
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+
+        .hero-section {
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        .hero-section h1 {
+            color: #4a4a4a;
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .hero-section p {
+            color: #888888;
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .play-btn {
+            background-color: #00a2ff;
+            color: white;
+            padding: 15px 30px;
+            font-size: 20px;
+            font-weight: 700;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: background-color 0.3s;
+        }
+
+        .play-btn:hover {
+            background-color: #0077cc;
+        }
+
+        /* Estilo da Seção de Jogos (Thumbnails) */
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        .game-card {
+            background-color: #ffffff;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            text-align: center;
+            padding-bottom: 10px;
+            cursor: pointer;
+        }
+
+        .game-card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            background-color: #cccccc; /* Placeholder para imagem */
+        }
+
+        .game-card h3 {
+            font-size: 16px;
+            color: #333333;
+            margin: 10px 0 5px;
+        }
+
+        .game-card p {
+            font-size: 14px;
+            color: #999999;
+        }
+
+        .game-header {
+            font-size: 24px;
+            color: #333333;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <a href="#" class="logo">BLOXFALL</a>
+        <div class="nav-links">
+            <a href="#">Descobrir</a>
+            <a href="#">Avatar</a>
+            <a href="#">Criar</a>
+            <a href="#">Robux</a>
+        </div>
+        <div>
+            <button class="login-btn">Entrar</button>
+        </div>
+    </div>
+
+    <div class="container">
+
+        <div class="hero-section">
+            <h1>Jogue o que Você Imaginar!</h1>
+            <p>Milhares de experiências criadas pela nossa comunidade esperam por você.</p>
+            <button class="play-btn">Jogar Agora</button>
+        </div>
+
+        <h2 class="game-header">🔥 Jogos Populares</h2>
+
+        <div class="games-grid">
+            <div class="game-card">
+                <img src="placeholder_game1.png" alt="Miniatura do Jogo">
+                <h3>Blox Race Simulator</h3>
+                <p>90.5k Jogando</p>
+            </div>
+            <div class="game-card">
+                <img src="placeholder_game2.png" alt="Miniatura do Jogo">
+                <h3>Tower of Hell</h3>
+                <p>75.2k Jogando</p>
+            </div>
+            <div class="game-card">
+                <img src="placeholder_game3.png" alt="Miniatura do Jogo">
+                <h3>Adopt Me Blox</h3>
+                <p>62.1k Jogando</p>
+            </div>
+            <div class="game-card">
+                <img src="placeholder_game4.png" alt="Miniatura do Jogo">
+                <h3>Murder Mystery X</h3>
+                <p>48.9k Jogando</p>
+            </div>
+            <div class="game-card">
+                <img src="placeholder_game5.png" alt="Miniatura do Jogo">
+                <h3>Bloxfall Tycoon</h3>
+                <p>35.4k Jogando</p>
+            </div>
+        </div>
+        
+    </div>
+    
+</body>
+</html>
