@@ -2,31 +2,36 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Variant Site</title>
+<title>Variant Site Remake</title>
 <style>
     body {
         margin: 0;
         font-family: 'Arial', sans-serif;
-        transition: all 0.5s;
         overflow: hidden;
+        transition: background 0.5s;
     }
     .container {
-        padding: 50px;
-        text-align: center;
-        transition: all 0.5s;
-        min-height: 100vh;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
+        min-height: 100vh;
+        text-align: center;
+        color: white;
+        text-shadow: 1px 1px 2px black;
+        padding: 50px;
+        transition: all 0.5s;
     }
     h1 {
+        font-size: 3em;
         margin-bottom: 20px;
     }
     p {
-        font-size: 20px;
+        font-size: 1.5em;
         max-width: 800px;
         line-height: 1.5;
+        margin: 10px 0;
+        white-space: pre-wrap;
     }
     .confetti-piece {
         position: fixed;
@@ -39,204 +44,83 @@
         0% { transform: translateY(0) rotate(0deg); }
         100% { transform: translateY(100vh) rotate(360deg); }
     }
+    .glitch {
+        animation: glitchAnim 1s infinite;
+    }
+    @keyframes glitchAnim {
+        0%{transform: translate(0,0);} 20%{transform: translate(-5px,5px);} 40%{transform: translate(5px,-5px);} 60%{transform: translate(-5px,5px);} 80%{transform: translate(5px,-5px);} 100%{transform: translate(0,0);}
+    }
 </style>
 </head>
 <body>
 <div id="app"></div>
-
 <script>
 function getRandom(min, max){ return Math.floor(Math.random()*(max-min)+min); }
 
-const funnyTexts = [
-    "cara q tedio. mano to rindo sozinho aqui, serio kkkk",
-    "bro sla, n to entendendo nada, mas ta hilario",
-    "quero sair daq pls, isso ta mto estranho e engraçado ao mesmo tempo",
-    "kkk serio? nunca vi algo assim",
-    "na moral... ta loko isso aq",
-    "wtf bro, nao sei nem o q dizer",
-    "isso é hilario, n aguento",
-    "mano, socorro, mas rindo mt",
-    "ta loko? socorro kkkk",
-    "rip minha vida, mas vlw pelo entretenimento",
-    "so um minutinho pls, to processando a loucura",
-    "oquei... td isso é real mesmo?",
-    "bem estranho isso, mas fascinante",
-    "aff q saco, mas to rindo",
-    "lol q aleatorio, n esperava isso",
-    "pq n? ta divertido msm",
-    "ai meu deus, to confuso e rindo",
-    "tenso isso, n to preparado",
-    "que viagem, n sei se rio ou choro",
-    "meh, mas continua curioso",
-    "fudeu, mas divertido",
-    "kkkkk n sei pq mas to rindo",
-    "wtf real, isso ta loco",
-    "vlw mano, surreal",
-    "so q rindo, n to acreditando"
-];
+const categories = ['Funny','Sexy','Creepy','Secret'];
 
-const sexyTexts = [
-    "hum, olha só... vc ta percebendo como esse site gosta de vc?",
-    "vc ta de boa? pq parece q ele só quer chamar atenção pra vc",
-    "hmmm, so observando seus movimentos na tela... curioso n?",
-    "só observando... e confesso, ta ficando interessante",
-    "vibe intensa aqui, confesso q to gostando do jeito q vc olha",
-    "so sexy, e o site parece saber disso kkk",
-    "pq n testar os limites? o site ta te provocando hehe",
-    "ai ai, olha isso, parece q ele quer flertar contigo",
-    "quer ver? olha cada detalhe... so pra vc",
-    "bro pls, n to brincando, o site ta te notando",
-    "ta quente aq, cada cor parece pra vc",
-    "hehehe, n to sozinho, mas ta parecendo...",
-    "confesso q... ta ficando interessante",
-    "quero mais, quero ver sua reação",
-    "so vibes, ta sentindo essa tensão?",
-    "se liga, cada variant é um jogo de sedução",
-    "top demais, mas n conte pra ninguem hehe",
-    "so pra ti, perceba os detalhes",
-    "hahaha... ta percebendo q ele te flerta?",
-    "realmente... n da pra ignorar",
-    "oi oi, olha oq eu posso fazer com cores e movimentos",
-    "so olhando msm, mas a atenção é toda sua",
-    "bro kkk, o site sabe q vc ta aqui",
-    "slk q vibes, n da pra resistir",
-    "vibe loka, ta sentindo isso?"
-];
-
-const creepyTexts = [
-    "voce me viu? eu to observando cada movimento seu...",
-    "ta sozinho? cuidado, pq n esta sozinho como pensa",
-    "nao desligue... ainda n acabou",
-    "sigo vc em cada scroll, cada click",
-    "escuto td oq vc digita... mentira, mas parece real",
-    "tem alguem aq, algo estranho no fundo",
-    "nao olhe atras, serio mesmo",
-    "segue silencioso, vc sente?",
-    "q som foi aquele? n olhe agora",
-    "soh um teste, mas ta ficando real",
-    "vc lembra de mim? n, mas ta perto",
-    "ta frio aq, sinto algo se aproximar",
-    "algo te observa, nao pisque",
-    "cara, medo, mas divertido",
-    "shhh... n fale nada",
-    "n tao seguro, mas curiosidade domina",
-    "vem comigo, mas n se mova",
-    "ta me ouvindo? hehe, talvez sim",
-    "isso n é normal, mas fascinante",
-    "ninguém sabe, mas eu sei",
-    "soh eu sei oq acontece aqui",
-    "oq sente? frio? calor? n importa",
-    "final chegando, prepare-se",
-    "algo se move, mas n veja",
-    "as sombras respiram..."
-];
-
-const secretTexts = [
-    "algo estranho aq, mas n percebe? oq ta por tras disso tudo",
-    "parece controlado, mas ta escondido",
-    "ninguém percebe, mas alguem observa",
-    "mas eu sei oq acontece por aqui",
-    "novo teste online, n conte pra ninguem",
-    "coisas mudam rapido, mas vcs n veem",
-    "oq vc ta vendo? apenas metade do que existe",
-    "isso parece vivo, pq ta mudando?",
-    "n sabe ainda, mas algo controla",
-    "nao diga nada, so observe",
-    "algo mais por tras, invisivel",
-    "sistema observando, mas n reage",
-    "oq n foi dito, ta acontecendo",
-    "historias antigas escondidas aqui",
-    "vc percebeu? ta tudo ligado",
-    "segredo antigo, n toque nisso",
-    "nova ta olhando, mas n diz nada",
-    "não se engane, nada é aleatorio",
-    "isso muda td sem avisar",
-    "olha de novo, perceba detalhes",
-    "ninguém fala sobre isso",
-    "coisas sumem, ou parecem",
-    "como sempre, controlado",
-    "wow final cabo, ultima linha",
-    "só vc sabe oq acontece..."
-];
-
-const allTexts = funnyTexts.concat(sexyTexts, creepyTexts, secretTexts);
-
-const variants = [];
-
-for(let i=1;i<=100;i++){
-    variants.push({
-        id: i,
-        category: i<=25?"Funny":i<=50?"Sexy":i<=75?"Creepy":"Secret",
-        text: allTexts[i-1],
-        generateHTML: function(){
-            const bg = `hsl(${getRandom(0,360)}, ${getRandom(50,80)}%, ${getRandom(30,70)}%)`;
-            const color = `hsl(${getRandom(0,360)}, ${getRandom(50,100)}%, ${getRandom(50,90)}%)`;
-            const fontFamily = ['Arial','Verdana','Comic Sans MS','Courier New','Georgia'][getRandom(0,5)];
-            const borderRadius = getRandom(0,50);
-            const padding = getRandom(50,150);
-            const effects = [];
-            
-            // Adiciona efeitos especiais em algumas variants
-            if(this.id%10===0){
-                effects.push('confetti');
-            }
-            if(this.id%15===0){
-                effects.push('darken');
-            }
-            if(this.id%20===0){
-                effects.push('glitch');
-            }
-            
-            let html = `<div class="container" style="
-                background:${bg};
-                color:${color};
-                font-family:${fontFamily};
-                border-radius:${borderRadius}px;
-                padding:${padding}px;
-                text-shadow: 1px 1px 2px black;
-                transform: rotate(${getRandom(-2,2)}deg);
-            ">
-                <h1>Variant ${this.id} (${this.category})</h1>
-                <p>${this.text}</p>
-            </div>`;
-            
-            // adiciona efeitos
-            if(effects.includes('confetti')){
-                html += `<script>
-                    for(let i=0;i<100;i++){
-                        let c = document.createElement('div');
-                        c.className='confetti-piece';
-                        c.style.left=Math.random()*100+'vw';
-                        c.style.background='hsl('+Math.random()*360+',80%,60%)';
-                        c.style.animationDuration=(2+Math.random()*2)+'s';
-                        document.body.appendChild(c);
-                    }
-                </script>`;
-            }
-            if(effects.includes('darken')){
-                html += `<div style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);pointer-events:none;"></div>`;
-            }
-            if(effects.includes('glitch')){
-                html += `<style>
-                    @keyframes glitch{
-                        0%{transform: translate(0,0);}
-                        20%{transform: translate(-5px,5px);}
-                        40%{transform: translate(5px,-5px);}
-                        60%{transform: translate(-5px,5px);}
-                        80%{transform: translate(5px,-5px);}
-                        100%{transform: translate(0,0);}
-                    }
-                    .container{animation: glitch 1s infinite;}
-                </style>`;
-            }
-            
-            return html;
-        }
-    });
+// Funções para gerar frases curtas de exemplo para cada categoria
+function generateText(category){
+    const texts = {
+        Funny: ["cara q tedio. mano to rindo sozinho kkk","bro sla, n to entendendo nada, mas ta hilario"],
+        Sexy: ["hum, olha só... vc ta percebendo como esse site gosta de vc?","vc ta de boa? pq parece q ele só quer chamar atenção pra vc"],
+        Creepy: ["voce me viu? eu to observando cada movimento seu...","ta sozinho? cuidado, n esta sozinho como pensa"],
+        Secret: ["algo estranho aq, mas n percebe? oq ta por tras disso tudo","parece controlado, mas ta escondido"]
+    };
+    return texts[category][getRandom(0,texts[category].length)];
 }
 
-const variant = variants[getRandom(0,variants.length)];
-document.getElementById("app").innerHTML = variant.generateHTML();
+function generateVariant(){
+    const category = categories[getRandom(0,categories.length)];
+    const color1 = `hsl(${getRandom(0,360)}, ${getRandom(50,80)}%, ${getRandom(40,60)}%)`;
+    const color2 = `hsl(${getRandom(0,360)}, ${getRandom(50,80)}%, ${getRandom(40,60)}%)`;
+    document.body.style.background = `linear-gradient(135deg, ${color1}, ${color2})`;
+
+    const container = document.createElement('div');
+    container.className='container';
+    container.style.fontFamily=['Arial','Verdana','Comic Sans MS','Courier New','Georgia'][getRandom(0,5)];
+    if(getRandom(0,5)===0) container.classList.add('glitch');
+    container.style.transform=`rotate(${getRandom(-2,2)}deg)`;
+
+    const h1 = document.createElement('h1');
+    h1.textContent = `Variant ${getRandom(1,101)} (${category})`;
+    const p = document.createElement('p');
+    p.textContent = generateText(category);
+
+    container.appendChild(h1);
+    container.appendChild(p);
+
+    const app = document.getElementById('app');
+    app.innerHTML='';
+    app.appendChild(container);
+
+    // Confetti efeito aleatório
+    if(getRandom(0,5)===0){
+        for(let i=0;i<50;i++){
+            const c=document.createElement('div');
+            c.className='confetti-piece';
+            c.style.left=Math.random()*100+'vw';
+            c.style.background=`hsl(${Math.random()*360},80%,60%)`;
+            c.style.animationDuration=(2+Math.random()*2)+'s';
+            document.body.appendChild(c);
+        }
+    }
+
+    // Dark overlay aleatório
+    if(getRandom(0,6)===0){
+        const d=document.createElement('div');
+        d.style.position='fixed';
+        d.style.top='0';
+        d.style.left='0';
+        d.style.width='100%';
+        d.style.height='100%';
+        d.style.background='rgba(0,0,0,0.7)';
+        d.style.pointerEvents='none';
+        document.body.appendChild(d);
+    }
+}
+
+generateVariant();
 </script>
 </body>
 </html>
