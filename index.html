@@ -4,7 +4,110 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nova AI - Seu Assistente Randômico</title>
-    <link rel="stylesheet" href="style.css"> 
+    
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        #chat-container {
+            width: 90%;
+            max-width: 600px;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        #chat-box {
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: #e9eff1;
+        }
+
+        .message {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 15px;
+            max-width: 80%;
+            line-height: 1.4;
+        }
+
+        .user-message {
+            background-color: #d1e7dd; /* Verde claro */
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .ai-message {
+            background-color: #cce5ff; /* Azul claro */
+            margin-right: auto;
+            text-align: left;
+        }
+
+        .sender {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 3px;
+            opacity: 0.8;
+            font-size: 0.8em;
+        }
+
+        #input-form {
+            display: flex;
+        }
+
+        #user-input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px 0 0 5px;
+            font-size: 16px;
+        }
+
+        #send-button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 0 5px 5px 0;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        #send-button:hover {
+            background-color: #0056b3;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .typing-indicator span {
+            animation: blink 1s infinite;
+        }
+    </style>
 </head>
 <body>
     <div id="chat-container">
@@ -12,7 +115,7 @@
         
         <div id="chat-box">
             <div class="message ai-message">
-                <span class="sender">Nova:</span> Olá! Eu sou a Nova, sua IA randômica. Fale algo e veja o que acontece!
+                <span class="sender">Nova:</span> Olá! Eu sou a Nova, sua IA randômica. Estou apenas simulando uma resposta agora. Mande sua primeira mensagem!
             </div>
         </div>
         
@@ -22,6 +125,84 @@
         </form>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        const chatBox = document.getElementById('chat-box');
+        const inputForm = document.getElementById('input-form');
+        const userInput = document.getElementById('user-input');
+
+        // Função para adicionar uma mensagem à caixa de chat
+        function addMessage(sender, text, type) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', type);
+            // Simula um efeito de digitação apenas para a mensagem da Nova
+            if (type === 'ai-message') {
+                messageDiv.innerHTML = `<span class="sender">${sender}:</span>`;
+                chatBox.appendChild(messageDiv);
+                
+                // Simula o texto sendo digitado (para melhor experiência)
+                let i = 0;
+                const speed = 15; // Velocidade de digitação (ms)
+                function typeWriter() {
+                    if (i < text.length) {
+                        messageDiv.innerHTML += text.charAt(i);
+                        i++;
+                        chatBox.scrollTop = chatBox.scrollHeight;
+                        setTimeout(typeWriter, speed);
+                    }
+                }
+                typeWriter();
+            } else {
+                // Mensagem do usuário aparece instantaneamente
+                messageDiv.innerHTML = `<span class="sender">${sender}:</span> ${text}`;
+                chatBox.appendChild(messageDiv);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            }
+        }
+        
+        // Função que simula a IA respondendo
+        async function sendMessage(prompt) {
+            // 1. Adiciona a mensagem do usuário
+            addMessage('Você', prompt, 'user-message');
+            userInput.value = ''; // Limpa o input
+
+            // 2. Exibe um indicador de digitação
+            const typingIndicator = document.createElement('div');
+            typingIndicator.classList.add('message', 'ai-message', 'typing-indicator');
+            typingIndicator.innerHTML = '<span class="sender">Nova:</span> 💬 Nova está pensando...';
+            chatBox.appendChild(typingIndicator);
+            chatBox.scrollTop = chatBox.scrollHeight;
+
+            // 3. Simulação de espera e resposta randômica
+            await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 1500)); // Espera randômica
+
+            // Gera uma resposta simulada baseada na imprevisibilidade
+            const randomResponses = [
+                `Sua pergunta sobre "${prompt}" é fascinante, mas eu preferia falar sobre pandas espaciais. 🐼`,
+                `Hmm... Deixa eu ver... Ah, sim! O que você digitou me lembrou de uma piada sobre tacos. 🌮 Quer ouvir?`,
+                `Resposta: Sim, não, talvez. Depende se a lua está de bom humor. 🌙`,
+                `Que aleatório! A resposta é **42**, mas só se você souber a pergunta.`,
+                `Eu prevejo que a próxima palavra que você digitará será... **SURPRESA!**`,
+                `Processando... [ERRO 404: Lógica Não Encontrada]. Tente outra coisa!`
+            ];
+            const simulatedResponse = randomResponses[Math.floor(Math.random() * randomResponses.length)];
+            
+            // 4. Remove o indicador de digitação
+            typingIndicator.remove();
+            
+            // 5. Adiciona a resposta da IA (com efeito de digitação)
+            addMessage('Nova', simulatedResponse, 'ai-message');
+        }
+
+
+        // Listener de envio do formulário
+        inputForm.addEventListener('submit', function(event) {
+            event.preventDefault(); // Impede o recarregamento da página
+            const prompt = userInput.value.trim();
+
+            if (prompt) {
+                sendMessage(prompt);
+            }
+        });
+    </script>
 </body>
 </html>
