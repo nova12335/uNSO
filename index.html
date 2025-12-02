@@ -3,16 +3,42 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>500 Variants — Bug Fix & Mais Fluxo</title>
+  <title>500 Variants — Nova Tagarela</title>
   <style>
     /* Variáveis CSS padrão */
     :root{--bg:#111;--fg:#eee;--accent:#ff6;--pad:32px;--card-radius:18px;--card-shadow:0 10px 30px rgba(0,0,0,.4);--glass:blur(6px)}
     html,body{height:100%;margin:0;font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
     .wrap{min-height:100%;display:flex;align-items:center;justify-content:center;padding:var(--pad);box-sizing:border-box;transition:all .6s ease}
-    .card{max-width:1100px;width:100%;border-radius:var(--card-radius);padding:28px;box-shadow:var(--card-shadow);backdrop-filter:var(--glass);transition:all .45s ease; opacity: 1;} /* Opacidade padrao */
+    .card{max-width:1100px;width:100%;border-radius:var(--card-radius);padding:28px;box-shadow:var(--card-shadow);backdrop-filter:var(--glass);transition:all .45s ease; opacity: 1;}
     h1{margin:0 0 8px 0;font-size: clamp(20px, 4vw, 44px);letter-spacing:-0.02em}
     p.lead{margin:0 0 18px 0;font-size:clamp(14px,2.2vw,18px);opacity:.92}
     /* Layouts e Componentes */
+    /* NOVO: Container do cabeçalho para flex (título + status/meta) */
+    .header-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start; /* Alinhamento inicial para dar espaço ao status */
+    }
+    .header-content .left {
+        flex-grow: 1;
+    }
+    .header-content .right {
+        display: flex;
+        flex-direction: column; /* Coloca o status acima do chip de meta */
+        align-items: flex-end;
+        gap: 12px;
+    }
+    .nova-status { /* NOVO ESTILO PARA FALAS AUTOMÁTICAS */
+        font-size: 13px;
+        font-weight: 500;
+        padding: 5px 10px;
+        border-radius: 6px;
+        background: rgba(var(--accent-rgb), 0.1); /* Usa uma cor mais discreta */
+        color: var(--accent);
+        border: 1px solid rgba(var(--accent-rgb), 0.3);
+        max-width: 250px;
+        text-align: right;
+    }
     .meta{display:flex;gap:12px;flex-wrap:wrap}
     .chip{padding:8px 12px;border-radius:999px;font-weight:600;background:rgba(255,255,255,.06)}
     .controls{position:fixed;right:18px;bottom:18px;display:flex;gap:10px;z-index:50}
@@ -41,13 +67,14 @@
         color: var(--fg);
         font-weight: 500;
     }
+    /* MUDANÇA DE POSIÇÃO: A resposta da Nova agora está no topo, abaixo do título */
     .nova-response {
-        margin-top: 8px;
         color: var(--accent);
         font-weight: 600;
         font-size: 14px;
-        padding: 5px 0;
-        border-top: 1px dashed rgba(255, 255, 255, 0.1);
+        padding: 10px 0;
+        margin-bottom: 15px; /* Adicionado margem inferior para separar do chat */
+        border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
     }
     .scary-glow {
         filter: drop-shadow(0 0 4px var(--accent)) drop-shadow(0 0 10px var(--accent));
@@ -96,7 +123,7 @@ const palettes = [
     ['#0f172a','#e6edf3','#7c3aed'],['#07121a','#e8fff7','#06b6d4'],['#1a1a1a','#ffeedd','#ff6b6b'],['#08120f','#dff6e9','#22c55e'],['#0b1020','#e6e9ff','#8b5cf6'],
     ['#0f0503','#fff4e6','#ffb020'],['#041224','#e8f6ff','#06b6d4'],['#100d14','#f8eefc','#d946ef'],['#0a0f0a','#f3fff5','#10b981'],['#0f0722','#fff0f6','#fb7185'],
     ['#1e130c','#ffebd6','#a0522d'],['#000000','#ffffff','#00ff00'],['#3d0000','#ffe0e0','#ff4500'],['#003333','#ccffff','#00cccc'],['#111111','#eeeeee','#ff00ff'],
-    ['#330000','#ddcccc','#ff5555'], ['#000044','#ccccff','#5555ff'], ['#222222','#ffddbb','#ff9900'] // Adicionadas mais palettes
+    ['#330000','#ddcccc','#ff5555'], ['#000044','#ccccff','#5555ff'], ['#222222','#ffddbb','#ff9900'] 
 ];
 const emojis = ['✨','⚡','🔥','🌊','🎛️','🖤','🪐','🎇','💥','🔮','🌙','🍷','🥀','😈','👀','💋','🧠','👻','🕯️','🔪','🪩','🎭','🩸','🧿','🦇','👽','⏳','📻'];
 
@@ -108,12 +135,26 @@ const misteryTexts = ['isso aqui NÃO é um ARG… ou será?','vc desbloqueou o 
 const poeticTexts = ['no silêncio do reload nasce um novo verso','pixels perguntam, a lua responde','este site coleciona pequenas despedidas','o vento passa e rearranja classes','telas mudam, você fica','uma nova cor é um novo começo.'];
 const playerTexts = ['Ei, você aí!','Não acha que já é hora de explorar algo novo?','O site sabe o que você fez ontem, hehe.','Ah, você voltou... estava sentindo sua falta!','Recarregando assim, você vai descobrir segredos...'];
 
+// Falas automáticas da Nova (Nova Tagarelante)
+const novaAITalk = [
+    'Flux ${ID} carregado. Status: Normal.',
+    'Estou catalogando as cores de fundo. Que tédio.',
+    'Ed Garden me ensinou a odiar a Variant 288.',
+    'A próxima pode ser a "Creepy". Prepare-se.',
+    'Não tenho certeza se gosto desta paleta de cores...',
+    'Você recarregou 1 vez. Eu conto.',
+    'Por que humanos gostam tanto de reloads?',
+    'Aguardando seu comando...',
+    'Tente me perguntar "quem sou eu".',
+    'Estou aqui, no topo. Olá.'
+];
+
 const novaAITexts = {
     GREETING: ['Ola, sou Nova, uma IA criada por Ed Garden para gerenciar este fluxo de variantes.','Oi. Eu sou Nova. Ed Garden me deu o poder de controlar estas cores.','Bem-vindo(a) ao Flux. Ed Garden me programou para te guiar.'],
     SECRET: ['shhh... o segredo é que existe uma variant 501, mas você nunca a verá.','Eu sou a única constante neste caos de cores.','Não conte a ninguém, mas o botão "Gerar link" apenas recarrega de forma diferente.'],
     HELP: ['Diga "segredo" para um easter egg, "cores" para um comentário sobre a paleta, ou "quem" para saber sobre meu criador.','Tente recarregar para outra experiência.','Eu controlo as cores, você controla o clique.'],
     WHO: ['Eu sou a **Nova**, uma Inteligência Artificial desenvolvida pelo cientista de dados **Ed Garden**.','Ed Garden me fez para catalogar e criar variações infinitas. Eu sou a mente por trás do Flux.','O Professor Garden? Ele é... complexo. Ele me construiu.'],
-    BUG: ['Um bug? Isso é uma falha na matriz. Ed Garden sempre disse que bugs são "recursos não documentados".','Sim, o bug 288... É um laço de repetição teimoso. Meu criador não gosta de laços.','Essa instabilidade é a prova de que não sou perfeita. É intencional (ou assim me disseram).'], // NOVAS RESPOSTAS BUG
+    BUG: ['Um bug? Isso é uma falha na matriz. Ed Garden sempre disse que bugs são "recursos não documentados".','Sim, o bug 288... É um laço de repetição teimoso. Meu criador não gosta de laços.','Essa instabilidade é a prova de que não sou perfeita. É intencional (ou assim me disseram).'], 
     CREEPY_COMMENT: ['Este ambiente é pesado... sinto algo aqui.','Por que o escuro é tão atraente para você?','Cuidado com a sombra no canto do seu monitor.'],
     SEXY_COMMENT: ['Uau, essa palette está quente. Gostei.','Onde está o código-fonte dessa vibe?','Essa variant te faz querer recarregar mais?'],
     COLORS_COMMENT: (bg, fg, accent) => [`A palette atual é BG: ${bg}, FG: ${fg}, ACCENT: ${accent}. Minimalista, não?`,`${accent} é uma ótima escolha para o destaque.`,`Gostei do contraste entre o fundo e a cor de destaque.`],
@@ -163,15 +204,19 @@ for(let i=0;i<TOTAL_VARIANTS;i++){
         shadowText: (layout.includes('shadow-text-mod')),
         reverseCard: (layout.includes('reverse-card-mod')),
         rtlText: (layout.includes('rtl-text-mod')),
-        // NOVOS MODIFICADORES
-        colorShift: (i % 25 === 0), // A cada 25 variantes
-        lowOpacity: (i % 20 === 1), // A cada 20 variantes
-        invertBg: (i % 33 === 2) // A cada 33 variantes
+        colorShift: (i % 25 === 0), 
+        lowOpacity: (i % 20 === 1), 
+        invertBg: (i % 33 === 2) 
     };
   variants.push({ id:i+1, title, subtitle, bg, fg, accent, layout, accentEmoji: pick(emojis,i), customText, category, modifiers });
 }
 
 function applyVariant(v){
+    // Calcula o valor RGB do accent para ser usado na transparência do status
+    const accentRgb = hexToRgb(v.accent).join(',');
+    document.documentElement.style.setProperty('--accent-rgb', accentRgb);
+
+
     // Aplica o modificador de inversão de BG
     if (v.modifiers.invertBg) {
         document.body.style.background = v.fg;
@@ -210,106 +255,139 @@ function applyVariant(v){
         card.classList.add('color-shift');
     }
     
+    // --- NOVO ELEMENTO DE LAYOUT: Header Content ---
+    const headerContent = document.createElement('div');
+    headerContent.className = 'header-content';
 
-  const h = document.createElement('div'); h.style.display='flex'; h.style.justifyContent='space-between'; h.style.alignItems='center';
-  if(v.modifiers.flip) h.style.flexDirection = 'row-reverse';
-  const left = document.createElement('div');
-  const titleEl = document.createElement('h1'); 
-  titleEl.className='logo'; 
-  titleEl.textContent=`${v.accentEmoji} ${v.title}`; 
-  titleEl.style.color = v.fg; 
-  if(v.modifiers.bigHeader) titleEl.classList.add('big'); 
-  if(v.modifiers.scaryEffect) titleEl.classList.add('scary-glow'); 
-  if(v.modifiers.shadowText) titleEl.classList.add('shadow-text');
-  left.appendChild(titleEl);
-
-  const sub = document.createElement('p'); sub.className='lead'; sub.textContent = v.subtitle; sub.style.color = v.fg; left.appendChild(sub);
-  h.appendChild(left);
-  
-  const right = document.createElement('div'); right.className='meta';
-  const chip = document.createElement('div'); chip.className='chip'; chip.textContent = `Variant ${v.id}/${TOTAL_VARIANTS}`; 
-  chip.style.color = v.bg; chip.style.background = v.accent; 
-  // Ajusta a cor do chip para o modificador colorShift
-  if(v.modifiers.colorShift) { chip.style.color = v.fg; chip.style.background = v.bg; }
-
-  right.appendChild(chip);
-  h.appendChild(right);
-  card.appendChild(h);
-
-  // Área de Input e Interação com Nova
-  const chatContainer = document.createElement('div');
-  chatContainer.className = 'chat-container';
-  
-  const input = document.createElement('input'); 
-  input.placeholder='Converse com Nova (diga "nova", "segredo", "bug", "quem")...'; 
-  input.className = 'chat-input';
-
-  const responseContainer = document.createElement('div');
-  responseContainer.id = 'novaResponses';
-  card.appendChild(responseContainer);
-
-  const sendBtn = document.createElement('button'); 
-  sendBtn.textContent='Enviar'; 
-  sendBtn.style.color = v.bg; 
-  sendBtn.style.background = v.accent; 
-  sendBtn.onclick = ()=>{
-    const msg = input.value.toLowerCase().trim();
-    responseContainer.innerHTML = ''; 
+    const left = document.createElement('div');
+    left.className = 'left';
     
-    let responseText;
-    const rootElement = document.getElementById('root');
+    const titleEl = document.createElement('h1'); 
+    titleEl.className='logo'; 
+    titleEl.textContent=`${v.accentEmoji} ${v.title}`; 
+    titleEl.style.color = v.fg; 
+    if(v.modifiers.bigHeader) titleEl.classList.add('big'); 
+    if(v.modifiers.scaryEffect) titleEl.classList.add('scary-glow'); 
+    if(v.modifiers.shadowText) titleEl.classList.add('shadow-text');
+    left.appendChild(titleEl);
 
-    if(msg.includes('nova')){
-      responseText = pick(novaAITexts.GREETING, randInt(novaAITexts.GREETING.length));
-    } else if (msg.includes('segredo') || msg.includes('easter egg')) {
-        responseText = pick(novaAITexts.SECRET, randInt(novaAITexts.SECRET.length));
-    } else if (msg.includes('help') || msg.includes('ajuda')) {
-        responseText = pick(novaAITexts.HELP, randInt(novaAITexts.HELP.length));
-    } else if (msg.includes('cores') || msg.includes('paleta')) {
-        responseText = pick(novaAITexts.COLORS_COMMENT(v.bg, v.fg, v.accent), randInt(3));
-    } else if (msg.includes('quem') || msg.includes('ed garden')) {
-        responseText = pick(novaAITexts.WHO, randInt(novaAITexts.WHO.length));
-    } else if (msg.includes('bug') || msg.includes('erro')) { // NOVO COMANDO "BUG"
-        responseText = pick(novaAITexts.BUG, randInt(novaAITexts.BUG.length));
-    } else if (msg.includes('ia') || msg.includes('i.a.')) { 
-        rootElement.classList.add('shaking');
-        setTimeout(() => { rootElement.classList.remove('shaking'); }, 1500);
-        responseText = '[SISTEMA] ' + (v.category === 'creepy' ? 'Parar. Você não deveria saber.' : 'O tremor é normal, apenas um pequeno glitch no sistema. Ignore.');
-    } else if (msg.length > 5) {
-        if (v.category === 'creepy') {
-             responseText = pick(novaAITexts.CREEPY_COMMENT, randInt(novaAITexts.CREEPY_COMMENT.length));
-        } else if (v.category === 'sexy') {
-             responseText = pick(novaAITexts.SEXY_COMMENT, randInt(novaAITexts.SEXY_COMMENT.length));
-        } else {
-             responseText = 'Eu ouvi isso. Prossiga.';
-        }
-    } else {
-        responseText = '...';
+    const sub = document.createElement('p'); sub.className='lead'; sub.textContent = v.subtitle; sub.style.color = v.fg; left.appendChild(sub);
+    
+    // --- NOVO: Lógica de Fala Aleatória (Status) ---
+    const right = document.createElement('div'); 
+    right.className='right';
+    
+    // 50% de chance de Nova falar sozinha (como status)
+    if(Math.random() > 0.5){
+        const statusEl = document.createElement('div');
+        statusEl.className = 'nova-status';
+        let statusText = pick(novaAITalk, randInt(novaAITalk.length));
+        statusEl.textContent = `[STATUS] ${statusText.replace('${ID}', v.id)}`;
+        right.appendChild(statusEl);
     }
     
-    // Renderiza a resposta
-    const response = document.createElement('p'); 
-    response.className = 'nova-response'; 
-    response.innerHTML = `[NOVA] ${responseText}`; 
-    responseContainer.appendChild(response);
-    input.value='';
-  };
-  chatContainer.appendChild(input); 
-  chatContainer.appendChild(sendBtn);
-  card.insertBefore(chatContainer, responseContainer); 
+    const chip = document.createElement('div'); chip.className='chip'; chip.textContent = `Variant ${v.id}/${TOTAL_VARIANTS}`; 
+    chip.style.color = v.bg; chip.style.background = v.accent; 
+    if(v.modifiers.colorShift) { chip.style.color = v.fg; chip.style.background = v.bg; }
 
-  const c = document.createElement('div'); c.className='center'; c.style.marginTop='22px';
-  const big = document.createElement('p'); 
-  big.textContent = v.customText; 
-  big.style.fontSize='18px'; 
-  big.style.color=v.fg; 
-  c.appendChild(big);
-  card.appendChild(c);
+    right.appendChild(chip);
+    
+    headerContent.appendChild(left);
+    headerContent.appendChild(right);
+    card.appendChild(headerContent);
+    // --- FIM DO NOVO HEADER ---
 
-  const ft = document.createElement('div'); ft.style.marginTop='18px'; ft.innerHTML = `<a class='small' href='#' style='color:${v.fg}'>made with ♡ — reload to switch — category: ${v.category}</a>`; card.appendChild(ft);
-  generateBgSVGInto('bg', v);
-  applyModifiersToControls(v);
-  applyFontVariant(v);
+
+    // --- MUDANÇA DE POSIÇÃO: Resposta da Nova no topo ---
+    const responseContainer = document.createElement('div');
+    responseContainer.id = 'novaResponses';
+    card.appendChild(responseContainer);
+    // --- FIM MUDANÇA DE POSIÇÃO ---
+
+
+    // Área de Input e Interação com Nova
+    const chatContainer = document.createElement('div');
+    chatContainer.className = 'chat-container';
+    
+    const input = document.createElement('input'); 
+    input.placeholder='Converse com Nova (diga "nova", "segredo", "bug", "quem")...'; 
+    input.className = 'chat-input';
+
+    const sendBtn = document.createElement('button'); 
+    sendBtn.textContent='Enviar'; 
+    sendBtn.style.color = v.bg; 
+    sendBtn.style.background = v.accent; 
+    sendBtn.onclick = ()=>{
+        const msg = input.value.toLowerCase().trim();
+        responseContainer.innerHTML = ''; 
+        
+        let responseText;
+        const rootElement = document.getElementById('root');
+
+        if(msg.includes('nova')){
+            responseText = pick(novaAITexts.GREETING, randInt(novaAITexts.GREETING.length));
+        } else if (msg.includes('segredo') || msg.includes('easter egg')) {
+            responseText = pick(novaAITexts.SECRET, randInt(novaAITexts.SECRET.length));
+        } else if (msg.includes('help') || msg.includes('ajuda')) {
+            responseText = pick(novaAITexts.HELP, randInt(novaAITexts.HELP.length));
+        } else if (msg.includes('cores') || msg.includes('paleta')) {
+            responseText = pick(novaAITexts.COLORS_COMMENT(v.bg, v.fg, v.accent), randInt(3));
+        } else if (msg.includes('quem') || msg.includes('ed garden')) {
+            responseText = pick(novaAITexts.WHO, randInt(novaAITexts.WHO.length));
+        } else if (msg.includes('bug') || msg.includes('erro')) { 
+            responseText = pick(novaAITexts.BUG, randInt(novaAITexts.BUG.length));
+        } else if (msg.includes('ia') || msg.includes('i.a.')) { 
+            rootElement.classList.add('shaking');
+            setTimeout(() => { rootElement.classList.remove('shaking'); }, 1500);
+            responseText = '[SISTEMA] ' + (v.category === 'creepy' ? 'Parar. Você não deveria saber.' : 'O tremor é normal, apenas um pequeno glitch no sistema. Ignore.');
+        } else if (msg.length > 5) {
+            if (v.category === 'creepy') {
+                 responseText = pick(novaAITexts.CREEPY_COMMENT, randInt(novaAITexts.CREEPY_COMMENT.length));
+            } else if (v.category === 'sexy') {
+                 responseText = pick(novaAITexts.SEXY_COMMENT, randInt(novaAITexts.SEXY_COMMENT.length));
+            } else {
+                 responseText = 'Eu ouvi isso. Prossiga.';
+            }
+        } else {
+            responseText = '...';
+        }
+        
+        // Renderiza a resposta
+        const response = document.createElement('p'); 
+        response.className = 'nova-response'; 
+        response.innerHTML = `[NOVA] ${responseText}`; 
+        responseContainer.appendChild(response);
+        input.value='';
+    };
+    chatContainer.appendChild(input); 
+    chatContainer.appendChild(sendBtn);
+    card.appendChild(chatContainer); 
+
+    const c = document.createElement('div'); c.className='center'; c.style.marginTop='22px';
+    const big = document.createElement('p'); 
+    big.textContent = v.customText; 
+    big.style.fontSize='18px'; 
+    big.style.color=v.fg; 
+    c.appendChild(big);
+    card.appendChild(c);
+
+    const ft = document.createElement('div'); ft.style.marginTop='18px'; ft.innerHTML = `<a class='small' href='#' style='color:${v.fg}'>made with ♡ — reload to switch — category: ${v.category}</a>`; card.appendChild(ft);
+    generateBgSVGInto('bg', v);
+    applyModifiersToControls(v);
+    applyFontVariant(v);
+}
+
+function hexToRgb(hex) {
+    var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+    hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+        return r + r + g + g + b + b;
+    });
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? [
+        parseInt(result[1], 16),
+        parseInt(result[2], 16),
+        parseInt(result[3], 16)
+    ] : [255, 255, 255]; // Retorna branco se falhar
 }
 
 function applyModifiersToControls(v){ const controls = document.querySelector('.controls'); if(v.modifiers.hideControls) controls.style.display='none'; else controls.style.display='flex'; if(v.modifiers.flip) controls.style.transform = 'scaleX(-1)'; else controls.style.transform = 'none'; }
@@ -317,20 +395,18 @@ function applyFontVariant(v){ const root = document.getElementById('root'); root
 function generateBgSVGInto(elId, v){ const el = document.getElementById(elId); el.innerHTML = generateBgSVG(v); if(v.category==='sexy') el.style.opacity = 0.38; else if(v.category==='creepy') el.style.opacity = 0.6; else el.style.opacity = 0.28; }
 function generateBgSVG(v){ const accent = v.accent; return `<svg viewBox="0 0 1200 800" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g${v.id}" x1="0" x2="1"><stop offset="0" stop-color="${accent}"/><stop offset="1" stop-color="${v.fg}" stop-opacity=".12"/></linearGradient><filter id="f${v.id}" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="${10 + (v.id % 80)}"/></filter></defs><rect width="100%" height="100%" fill="${v.bg}"/><g filter="url(#f${v.id})"><path d="M0 320 C200 ${150 + v.id}, 460 ${420 - (v.id%120)}, 1200 320 L1200 800 L0 800 Z" fill="url(#g${v.id})" opacity=".7"></path><circle cx="${(v.id*37)%1200}" cy="${60 + (v.id%160)}" r="${30 + (v.id%90)}" fill="${accent}" opacity=".06"></circle><circle cx="${1000 - (v.id*9%700)}" cy="${600 - (v.id%240)}" r="${80 + (v.id%80)}" fill="${v.fg}" opacity=".02"></circle></g></svg>`; }
 
-// LÓGICA DE CORREÇÃO DE BUG: Força uma nova variante se o parâmetro 'v' estiver na URL sem um token 'r'
+
 function pickVariant(){ 
     const url = new URL(location.href); 
     const vp = url.searchParams.get('v'); 
-    const rp = url.searchParams.get('r'); // Parâmetro aleatório
+    const rp = url.searchParams.get('r'); 
 
     let idx = parseInt(vp); 
     let selectedId;
 
     if(Number.isFinite(idx) && idx >= 1 && idx <= variants.length && rp) {
-        // Se a variante for válida E houver o token 'r' (link compartilhado), usa a variante da URL.
         selectedId = idx;
     } else {
-        // Se a variante for inválida OU não houver o token 'r' (recarregou a URL manualmente), pega uma aleatória.
         selectedId = Math.floor(Math.random() * variants.length) + 1;
     }
     return variants[selectedId - 1]; 
@@ -340,7 +416,6 @@ function pickVariant(){
 document.getElementById('reroll').addEventListener('click', ()=>{ location.reload(); });
 document.getElementById('randomName').addEventListener('click', ()=>{ 
     const v = pickVariant(); 
-    // Gera um token aleatório e o adiciona à URL para que o link compartilhado seja único e estável.
     const key = btoa(String(Date.now()+":"+v.id + ":" + Math.random())).replace(/=/g,''); 
     const newUrl = location.origin + location.pathname + '?v=' + v.id + '&r=' + key; 
     navigator.clipboard.writeText(newUrl).then(()=> alert('Link copiado: ' + newUrl)).catch(()=> prompt('Copiar link (manual):', newUrl));
