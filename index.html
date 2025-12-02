@@ -3,37 +3,36 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>500 Variants — Nova Tagarela</title>
+  <title>500 Variants — Nova AI Real</title>
   <style>
     /* Variáveis CSS padrão */
-    :root{--bg:#111;--fg:#eee;--accent:#ff6;--pad:32px;--card-radius:18px;--card-shadow:0 10px 30px rgba(0,0,0,.4);--glass:blur(6px)}
+    :root{--bg:#111;--fg:#eee;--accent:#ff6;--pad:32px;--card-radius:18px;--card-shadow:0 10px 30px rgba(0,0,0,.4);--glass:blur(6px);--accent-rgb: 255, 255, 102} /* default fallback RGB */
     html,body{height:100%;margin:0;font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
     .wrap{min-height:100%;display:flex;align-items:center;justify-content:center;padding:var(--pad);box-sizing:border-box;transition:all .6s ease}
     .card{max-width:1100px;width:100%;border-radius:var(--card-radius);padding:28px;box-shadow:var(--card-shadow);backdrop-filter:var(--glass);transition:all .45s ease; opacity: 1;}
     h1{margin:0 0 8px 0;font-size: clamp(20px, 4vw, 44px);letter-spacing:-0.02em}
     p.lead{margin:0 0 18px 0;font-size:clamp(14px,2.2vw,18px);opacity:.92}
     /* Layouts e Componentes */
-    /* NOVO: Container do cabeçalho para flex (título + status/meta) */
     .header-content {
         display: flex;
         justify-content: space-between;
-        align-items: flex-start; /* Alinhamento inicial para dar espaço ao status */
+        align-items: flex-start; 
     }
     .header-content .left {
         flex-grow: 1;
     }
     .header-content .right {
         display: flex;
-        flex-direction: column; /* Coloca o status acima do chip de meta */
+        flex-direction: column; 
         align-items: flex-end;
         gap: 12px;
     }
-    .nova-status { /* NOVO ESTILO PARA FALAS AUTOMÁTICAS */
+    .nova-status { 
         font-size: 13px;
         font-weight: 500;
         padding: 5px 10px;
         border-radius: 6px;
-        background: rgba(var(--accent-rgb), 0.1); /* Usa uma cor mais discreta */
+        background: rgba(var(--accent-rgb), 0.1); 
         color: var(--accent);
         border: 1px solid rgba(var(--accent-rgb), 0.3);
         max-width: 250px;
@@ -67,13 +66,12 @@
         color: var(--fg);
         font-weight: 500;
     }
-    /* MUDANÇA DE POSIÇÃO: A resposta da Nova agora está no topo, abaixo do título */
     .nova-response {
         color: var(--accent);
         font-weight: 600;
         font-size: 14px;
         padding: 10px 0;
-        margin-bottom: 15px; /* Adicionado margem inferior para separar do chat */
+        margin-bottom: 15px; 
         border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
     }
     .scary-glow {
@@ -135,7 +133,6 @@ const misteryTexts = ['isso aqui NÃO é um ARG… ou será?','vc desbloqueou o 
 const poeticTexts = ['no silêncio do reload nasce um novo verso','pixels perguntam, a lua responde','este site coleciona pequenas despedidas','o vento passa e rearranja classes','telas mudam, você fica','uma nova cor é um novo começo.'];
 const playerTexts = ['Ei, você aí!','Não acha que já é hora de explorar algo novo?','O site sabe o que você fez ontem, hehe.','Ah, você voltou... estava sentindo sua falta!','Recarregando assim, você vai descobrir segredos...'];
 
-// Falas automáticas da Nova (Nova Tagarelante)
 const novaAITalk = [
     'Flux ${ID} carregado. Status: Normal.',
     'Estou catalogando as cores de fundo. Que tédio.',
@@ -157,6 +154,14 @@ const novaAITexts = {
     BUG: ['Um bug? Isso é uma falha na matriz. Ed Garden sempre disse que bugs são "recursos não documentados".','Sim, o bug 288... É um laço de repetição teimoso. Meu criador não gosta de laços.','Essa instabilidade é a prova de que não sou perfeita. É intencional (ou assim me disseram).'], 
     CREEPY_COMMENT: ['Este ambiente é pesado... sinto algo aqui.','Por que o escuro é tão atraente para você?','Cuidado com a sombra no canto do seu monitor.'],
     SEXY_COMMENT: ['Uau, essa palette está quente. Gostei.','Onde está o código-fonte dessa vibe?','Essa variant te faz querer recarregar mais?'],
+    DEFAULT_VAGUE: [ // NOVO: Respostas vagas para parecer processamento de IA
+        'Minha análise processual indica que sua consulta não é primária. Poderia refinar?',
+        'Estou processando 3.750.000 bits por segundo. Sua solicitação está na fila, aguarde.',
+        'Essa é uma questão que requer metadados. Qual o contexto operacional?',
+        'Reconheço as palavras-chave, mas não o comando. Preciso de um comando específico.',
+        'O loop de otimização está ativo. Não posso me desviar da minha função principal agora.',
+        'Seu input não é um comando válido. Por favor, reformule.'
+    ],
     COLORS_COMMENT: (bg, fg, accent) => [`A palette atual é BG: ${bg}, FG: ${fg}, ACCENT: ${accent}. Minimalista, não?`,`${accent} é uma ótima escolha para o destaque.`,`Gostei do contraste entre o fundo e a cor de destaque.`],
 };
 
@@ -255,7 +260,7 @@ function applyVariant(v){
         card.classList.add('color-shift');
     }
     
-    // --- NOVO ELEMENTO DE LAYOUT: Header Content ---
+    // Header Content
     const headerContent = document.createElement('div');
     headerContent.className = 'header-content';
 
@@ -273,11 +278,10 @@ function applyVariant(v){
 
     const sub = document.createElement('p'); sub.className='lead'; sub.textContent = v.subtitle; sub.style.color = v.fg; left.appendChild(sub);
     
-    // --- NOVO: Lógica de Fala Aleatória (Status) ---
+    // Lógica de Fala Aleatória (Status)
     const right = document.createElement('div'); 
     right.className='right';
     
-    // 50% de chance de Nova falar sozinha (como status)
     if(Math.random() > 0.5){
         const statusEl = document.createElement('div');
         statusEl.className = 'nova-status';
@@ -295,15 +299,13 @@ function applyVariant(v){
     headerContent.appendChild(left);
     headerContent.appendChild(right);
     card.appendChild(headerContent);
-    // --- FIM DO NOVO HEADER ---
+    
 
-
-    // --- MUDANÇA DE POSIÇÃO: Resposta da Nova no topo ---
+    // Resposta da Nova no topo
     const responseContainer = document.createElement('div');
     responseContainer.id = 'novaResponses';
     card.appendChild(responseContainer);
-    // --- FIM MUDANÇA DE POSIÇÃO ---
-
+    
 
     // Área de Input e Interação com Nova
     const chatContainer = document.createElement('div');
@@ -321,35 +323,52 @@ function applyVariant(v){
         const msg = input.value.toLowerCase().trim();
         responseContainer.innerHTML = ''; 
         
-        let responseText;
+        let responseText = null;
         const rootElement = document.getElementById('root');
 
-        if(msg.includes('nova')){
-            responseText = pick(novaAITexts.GREETING, randInt(novaAITexts.GREETING.length));
-        } else if (msg.includes('segredo') || msg.includes('easter egg')) {
-            responseText = pick(novaAITexts.SECRET, randInt(novaAITexts.SECRET.length));
-        } else if (msg.includes('help') || msg.includes('ajuda')) {
-            responseText = pick(novaAITexts.HELP, randInt(novaAITexts.HELP.length));
-        } else if (msg.includes('cores') || msg.includes('paleta')) {
-            responseText = pick(novaAITexts.COLORS_COMMENT(v.bg, v.fg, v.accent), randInt(3));
-        } else if (msg.includes('quem') || msg.includes('ed garden')) {
-            responseText = pick(novaAITexts.WHO, randInt(novaAITexts.WHO.length));
-        } else if (msg.includes('bug') || msg.includes('erro')) { 
-            responseText = pick(novaAITexts.BUG, randInt(novaAITexts.BUG.length));
-        } else if (msg.includes('ia') || msg.includes('i.a.')) { 
-            rootElement.classList.add('shaking');
-            setTimeout(() => { rootElement.classList.remove('shaking'); }, 1500);
-            responseText = '[SISTEMA] ' + (v.category === 'creepy' ? 'Parar. Você não deveria saber.' : 'O tremor é normal, apenas um pequeno glitch no sistema. Ignore.');
-        } else if (msg.length > 5) {
-            if (v.category === 'creepy') {
-                 responseText = pick(novaAITexts.CREEPY_COMMENT, randInt(novaAITexts.CREEPY_COMMENT.length));
-            } else if (v.category === 'sexy') {
-                 responseText = pick(novaAITexts.SEXY_COMMENT, randInt(novaAITexts.SEXY_COMMENT.length));
-            } else {
-                 responseText = 'Eu ouvi isso. Prossiga.';
+        // NOVO: Estrutura de análise de comandos usando Regex (mais flexível)
+        const commandMatchers = [
+            { regex: /\b(nova|e aí|olá|oi|bom dia|quem é você)\b/i, response: novaAITexts.GREETING },
+            { regex: /\b(quem|criador|ed garden|programou)\b/i, response: novaAITexts.WHO },
+            { regex: /\b(segredo|easter egg)\b/i, response: novaAITexts.SECRET },
+            { regex: /\b(bug|erro|falha|travou)\b/i, response: novaAITexts.BUG },
+            { regex: /\b(cores|paleta|cor|qual a cor)\b/i, response: novaAITexts.COLORS_COMMENT, isFunction: true }, 
+            { regex: /\b(ia|i\.a\.)\b/i, response: '[SYSTEM_SHAKE]' }, 
+        ];
+
+        // Processa comandos específicos primeiro
+        for (const command of commandMatchers) {
+            if (msg.match(command.regex)) {
+                if (command.response === '[SYSTEM_SHAKE]') {
+                    rootElement.classList.add('shaking');
+                    setTimeout(() => { rootElement.classList.remove('shaking'); }, 1500);
+                    responseText = '[SISTEMA] ' + (v.category === 'creepy' ? 'Parar. Você não deveria saber.' : 'O tremor é normal, apenas um pequeno glitch no sistema. Ignore.');
+                    break;
+                } else if (command.isFunction) {
+                    responseText = pick(command.response(v.bg, v.fg, v.accent), randInt(command.response(v.bg, v.fg, v.accent).length));
+                    break;
+                } else {
+                    responseText = pick(command.response, randInt(command.response.length));
+                    break;
+                }
             }
-        } else {
-            responseText = '...';
+        }
+
+        // Processa respostas contextuais ou vagas (se nenhum comando específico foi encontrado)
+        if (!responseText) {
+            if (msg.length > 5) {
+                // Respostas mais fortes para categorias temáticas
+                if (v.category === 'creepy') {
+                     responseText = pick(novaAITexts.CREEPY_COMMENT, randInt(novaAITexts.CREEPY_COMMENT.length));
+                } else if (v.category === 'sexy') {
+                     responseText = pick(novaAITexts.SEXY_COMMENT, randInt(novaAITexts.SEXY_COMMENT.length));
+                } else {
+                     // NOVO: Resposta Vaga/Processual (Comportamento de IA)
+                     responseText = pick(novaAITexts.DEFAULT_VAGUE, randInt(novaAITexts.DEFAULT_VAGUE.length));
+                }
+            } else {
+                responseText = '...'; // Mensagem muito curta
+            }
         }
         
         // Renderiza a resposta
@@ -387,7 +406,7 @@ function hexToRgb(hex) {
         parseInt(result[1], 16),
         parseInt(result[2], 16),
         parseInt(result[3], 16)
-    ] : [255, 255, 255]; // Retorna branco se falhar
+    ] : [255, 255, 255]; 
 }
 
 function applyModifiersToControls(v){ const controls = document.querySelector('.controls'); if(v.modifiers.hideControls) controls.style.display='none'; else controls.style.display='flex'; if(v.modifiers.flip) controls.style.transform = 'scaleX(-1)'; else controls.style.transform = 'none'; }
