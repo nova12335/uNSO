@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Mini Simulador de Vida</title>
+<title>Mini Simulador de Vida Avançado</title>
 <style>
   body {
     font-family: 'Courier New', monospace;
@@ -14,12 +14,13 @@
     justify-content: flex-start;
     min-height: 100vh;
     padding: 20px;
+    transition: background 1s, color 1s;
   }
   #gameBox {
     background: rgba(0,0,0,0.7);
     padding: 20px;
     border-radius: 15px;
-    max-width: 600px;
+    max-width: 700px;
     text-align: center;
     box-shadow: 0 0 20px #00ff99;
   }
@@ -38,64 +39,156 @@
 </style>
 </head>
 <body>
-  <h1>Mini Simulador de Vida</h1>
-  <div id="gameBox">
-    <p id="story">Bem-vindo ao mundo! Você acorda em um quarto estranho. O que você faz?</p>
-    <div id="choices">
-      <button onclick="makeChoice(1)">Olhar pela janela</button>
-      <button onclick="makeChoice(2)">Explorar o quarto</button>
-    </div>
+<h1>Mini Simulador de Vida Avançado</h1>
+<div id="gameBox">
+  <p id="story">Bem-vindo! Você acorda em um quarto estranho. O que você faz?</p>
+  <div id="choices">
+    <button onclick="makeChoice(1)">Olhar pela janela</button>
+    <button onclick="makeChoice(2)">Explorar o quarto</button>
   </div>
+</div>
 
 <script>
 let state = 0;
+let path = []; // Guarda escolhas para rotas especiais
 
 function makeChoice(choice) {
   const story = document.getElementById('story');
   const choices = document.getElementById('choices');
+  path.push(choice); // guarda cada escolha para rotas especiais
 
-  if(state === 0) {
-    if(choice === 1) {
-      story.innerText = "Você vê uma cidade futurista iluminada por néon. Um som estranho vem da rua.";
-      choices.innerHTML = '<button onclick="makeChoice(3)">Sair para investigar</button><button onclick="makeChoice(4)">Ignorar e voltar para a cama</button>';
-      state = 1;
-    } else {
-      story.innerText = "Você encontra um diário antigo com símbolos estranhos. Parece que algo quer falar com você.";
-      choices.innerHTML = '<button onclick="makeChoice(5)">Ler o diário</button><button onclick="makeChoice(6)">Ignorar e explorar o corredor</button>';
-      state = 2;
-    }
-  } 
-  else if(state === 1) {
-    if(choice === 3) {
-      story.innerText = "Ao sair, um NPC estranho aparece e diz: 'Finalmente você chegou! Estávamos te esperando.'";
-      choices.innerHTML = '<button onclick="makeChoice(7)">Seguir o NPC</button><button onclick="makeChoice(8)">Correr para a rua</button>';
-      state = 3;
-    } else {
-      story.innerText = "Você volta para a cama e adormece. Talvez o mundo esteja esperando você acordar...";
+  switch(state) {
+
+    // ESTADO 0: Quarto inicial
+    case 0:
+      if(choice===1){
+        story.innerText = "Você vê uma cidade futurista iluminada por néon. Um som estranho vem da rua.";
+        choices.innerHTML = '<button onclick="makeChoice(3)">Sair para investigar</button><button onclick="makeChoice(4)">Ignorar e voltar para a cama</button>';
+        state = 1;
+      } else {
+        story.innerText = "Você encontra um diário antigo com símbolos estranhos. Parece que algo quer falar com você.";
+        choices.innerHTML = '<button onclick="makeChoice(5)">Ler o diário</button><button onclick="makeChoice(6)">Ignorar e explorar o corredor</button>';
+        state = 2;
+      }
+      break;
+
+    // ESTADO 1: Janela
+    case 1:
+      if(choice===3){
+        story.innerText = "Ao sair, um NPC estranho aparece e diz: 'Finalmente você chegou! Estávamos te esperando.'";
+        choices.innerHTML = '<button onclick="makeChoice(7)">Seguir o NPC</button><button onclick="makeChoice(8)">Correr para a rua</button>';
+        state = 3;
+      } else {
+        story.innerText = "Você volta para a cama e adormece. O mundo espera você acordar...";
+        choices.innerHTML = '<button onclick="endGame(1)">Fim 1: Dorminhoco</button>';
+        state = 100;
+      }
+      break;
+
+    // ESTADO 2: Diário / Corredor
+    case 2:
+      if(choice===5){
+        story.innerText = "As palavras do diário brilham! Você sente conhecimento secreto.";
+        choices.innerHTML = '<button onclick="makeChoice(9)">Abrir porta secreta</button><button onclick="makeChoice(10)">Guardar diário e sair</button>';
+        state = 4;
+      } else {
+        story.innerText = "O corredor leva a uma porta trancada. Ouve-se passos se aproximando...";
+        choices.innerHTML = '<button onclick="makeChoice(11)">Esconder-se</button><button onclick="makeChoice(12)">Abrir a porta</button>';
+        state = 5;
+      }
+      break;
+
+    // ESTADO 3: Seguir NPC ou correr
+    case 3:
+      if(choice===7){
+        story.innerText = "O NPC te guia até um laboratório secreto. Você vê máquinas e telas piscando.";
+        choices.innerHTML = '<button onclick="makeChoice(13)">Investigar as telas</button><button onclick="makeChoice(14)">Explorar o laboratório</button>';
+        state = 6;
+      } else {
+        story.innerText = "Você corre pela rua e encontra um beco sem saída. Um veículo estranho aparece...";
+        choices.innerHTML = '<button onclick="endGame(2)">Fim 2: Capturado</button>';
+        state = 100;
+      }
+      break;
+
+    // ESTADO 4: Diário aberto
+    case 4:
+      if(choice===9){
+        story.innerText = "A porta secreta leva a uma sala misteriosa. Uma figura holográfica aparece: é a Nova!";
+        document.body.style.background = "#4B0082"; // muda cor do site
+        document.body.style.color = "#FF99FF";
+        choices.innerHTML = '<button onclick="endGame(15)">Fim 15: A Nova te leva a outro site</button>';
+        state = 100;
+      } else {
+        story.innerText = "Você sai do quarto com o diário. O mundo está silencioso e vazio...";
+        choices.innerHTML = '<button onclick="endGame(3)">Fim 3: Vazio</button>';
+        state = 100;
+      }
+      break;
+
+    // ESTADO 5: Corredor trancado
+    case 5:
+      if(choice===11){
+        story.innerText = "Você se esconde e observa uma sombra passando. Parece que algo está te caçando...";
+        choices.innerHTML = '<button onclick="endGame(4)">Fim 4: Sombra</button>';
+        state = 100;
+      } else {
+        story.innerText = "Ao abrir a porta, cai em um poço escuro. Você escuta risadas.";
+        choices.innerHTML = '<button onclick="endGame(5)">Fim 5: Poço</button>';
+        state = 100;
+      }
+      break;
+
+    // ESTADO 6: Laboratório
+    case 6:
+      if(choice===13){
+        story.innerText = "As telas mostram segredos do mundo. Você aprende algo que muda sua vida.";
+        choices.innerHTML = '<button onclick="endGame(6)">Fim 6: Iluminado</button>';
+        state = 100;
+      } else {
+        story.innerText = "Explorando o laboratório, você ativa um alarme. Guardas chegam rapidamente.";
+        choices.innerHTML = '<button onclick="endGame(7)">Fim 7: Capturado no laboratório</button>';
+        state = 100;
+      }
+      break;
+
+    // ROTAS adicionais / finais genéricos
+    default:
+      story.innerText = "Sua jornada continua... Mas isso é só o começo!";
       choices.innerHTML = '<button onclick="restartGame()">Recomeçar</button>';
-    }
-  }
-  else if(state === 2) {
-    if(choice === 5) {
-      story.innerText = "As palavras do diário começam a brilhar! Você sente que ganhou conhecimento secreto.";
-      choices.innerHTML = '<button onclick="makeChoice(9)">Usar o conhecimento para abrir uma porta secreta</button><button onclick="makeChoice(10)">Guardar o diário e sair</button>';
-      state = 4;
-    } else {
-      story.innerText = "O corredor leva a uma porta trancada. Ouve-se passos se aproximando...";
-      choices.innerHTML = '<button onclick="makeChoice(11)">Esconder-se</button><button onclick="makeChoice(12)">Abrir a porta</button>';
-      state = 5;
-    }
-  }
-  else {
-    // Finais simples
-    story.innerText = "Sua jornada continua... Mas isso é só o começo da sua história!";
-    choices.innerHTML = '<button onclick="restartGame()">Recomeçar</button>';
   }
 }
 
+// Função para finalizar com Finais diferentes
+function endGame(fim) {
+  const story = document.getElementById('story');
+  const choices = document.getElementById('choices');
+  switch(fim){
+    case 1: story.innerText = "Você dormiu profundamente. Fim 1."; break;
+    case 2: story.innerText = "Você foi capturado na rua. Fim 2."; break;
+    case 3: story.innerText = "O mundo está silencioso. Fim 3."; break;
+    case 4: story.innerText = "A sombra te alcançou. Fim 4."; break;
+    case 5: story.innerText = "Você caiu no poço escuro. Fim 5."; break;
+    case 6: story.innerText = "Você aprendeu segredos ocultos. Fim 6."; break;
+    case 7: story.innerText = "Guardas te capturaram. Fim 7."; break;
+    case 15:
+      story.innerText = "Nova aparece e diz: 'Siga este link...'";
+      choices.innerHTML = `<button onclick="window.location.href='https://youtube.com'">Ir para outro site</button>`;
+      return;
+    default:
+      story.innerText = "Fim misterioso.";
+  }
+  choices.innerHTML = '<button onclick="restartGame()">Recomeçar</button>';
+  state = 100;
+}
+
+// Função para reiniciar
 function restartGame() {
   state = 0;
-  document.getElementById('story').innerText = "Bem-vindo ao mundo! Você acorda em um quarto estranho. O que você faz?";
+  path = [];
+  document.body.style.background = "linear-gradient(to bottom, #0f0f0f, #1a1a1a)";
+  document.body.style.color = "#00ff99";
+  document.getElementById('story').innerText = "Bem-vindo! Você acorda em um quarto estranho. O que você faz?";
   document.getElementById('choices').innerHTML = `
     <button onclick="makeChoice(1)">Olhar pela janela</button>
     <button onclick="makeChoice(2)">Explorar o quarto</button>
