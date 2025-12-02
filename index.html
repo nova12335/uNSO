@@ -3,13 +3,13 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>500 Variants — Nova 2.0</title>
+  <title>500 Variants — Bug Fix & Mais Fluxo</title>
   <style>
     /* Variáveis CSS padrão */
     :root{--bg:#111;--fg:#eee;--accent:#ff6;--pad:32px;--card-radius:18px;--card-shadow:0 10px 30px rgba(0,0,0,.4);--glass:blur(6px)}
     html,body{height:100%;margin:0;font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
     .wrap{min-height:100%;display:flex;align-items:center;justify-content:center;padding:var(--pad);box-sizing:border-box;transition:all .6s ease}
-    .card{max-width:1100px;width:100%;border-radius:var(--card-radius);padding:28px;box-shadow:var(--card-shadow);backdrop-filter:var(--glass);transition:all .45s ease}
+    .card{max-width:1100px;width:100%;border-radius:var(--card-radius);padding:28px;box-shadow:var(--card-shadow);backdrop-filter:var(--glass);transition:all .45s ease; opacity: 1;} /* Opacidade padrao */
     h1{margin:0 0 8px 0;font-size: clamp(20px, 4vw, 44px);letter-spacing:-0.02em}
     p.lead{margin:0 0 18px 0;font-size:clamp(14px,2.2vw,18px);opacity:.92}
     /* Layouts e Componentes */
@@ -62,7 +62,7 @@
     .rtl-text * {
         direction: rtl;
     }
-    /* NOVO: Efeito de Tremer (Glitch/Shake) */
+    /* Efeito de Tremer (Glitch/Shake) */
     @keyframes shake {
         0%, 100% { transform: translate(0, 0) rotate(0deg); }
         20%, 60% { transform: translate(-5px, 0) rotate(-0.5deg); }
@@ -71,9 +71,13 @@
     .shaking {
         animation: shake 0.3s ease-in-out infinite;
     }
+    /* NOVO: CSS para modificadores */
+    .low-opacity { opacity: 0.45 !important; }
+    .color-shift { color: var(--bg) !important; background-color: var(--accent) !important; }
+    .color-shift h1, .color-shift p { color: var(--bg) !important; }
   </style>
 </head>
-<body>
+<body id="pageBody">
   <div id="bg" class="bg-wave"></div>
   <div id="root" class="wrap">
     <div class="card" id="card"></div>
@@ -91,11 +95,11 @@ const TOTAL_VARIANTS = 500;
 const palettes = [
     ['#0f172a','#e6edf3','#7c3aed'],['#07121a','#e8fff7','#06b6d4'],['#1a1a1a','#ffeedd','#ff6b6b'],['#08120f','#dff6e9','#22c55e'],['#0b1020','#e6e9ff','#8b5cf6'],
     ['#0f0503','#fff4e6','#ffb020'],['#041224','#e8f6ff','#06b6d4'],['#100d14','#f8eefc','#d946ef'],['#0a0f0a','#f3fff5','#10b981'],['#0f0722','#fff0f6','#fb7185'],
-    ['#1e130c','#ffebd6','#a0522d'],['#000000','#ffffff','#00ff00'],['#3d0000','#ffe0e0','#ff4500'],['#003333','#ccffff','#00cccc'],['#111111','#eeeeee','#ff00ff']
+    ['#1e130c','#ffebd6','#a0522d'],['#000000','#ffffff','#00ff00'],['#3d0000','#ffe0e0','#ff4500'],['#003333','#ccffff','#00cccc'],['#111111','#eeeeee','#ff00ff'],
+    ['#330000','#ddcccc','#ff5555'], ['#000044','#ccccff','#5555ff'], ['#222222','#ffddbb','#ff9900'] // Adicionadas mais palettes
 ];
 const emojis = ['✨','⚡','🔥','🌊','🎛️','🖤','🪐','🎇','💥','🔮','🌙','🍷','🥀','😈','👀','💋','🧠','👻','🕯️','🔪','🪩','🎭','🩸','🧿','🦇','👽','⏳','📻'];
 
-// Textos (Manteve os mesmos do anterior)
 const sexyTexts = ['texto sensual: *passa a mão no código*','a noite é nossa — e o reload também','não é só o site que aquece... cuidado','sussurros de CSS e promessas de hover','chega mais perto... o layout tá chamando','você sempre volta, né? adoro isso'];
 const creepyTexts = ['eu sinto q tem alguém me observando','não leia isso à noite','porta fechada. luz acesa. silêncio','tem algo atrás de você... acho','você ouviu isso? eu ouvi','fique... não vá embora...','ela espera na próxima variant.'];
 const randomTexts = ['texto randômico 291817','eu gosto de café e reloads','isso daqui n era pra existir','variant cursed real','tô sem ideia mas o site pediu pra escrever','mais um dia, mais um reload'];
@@ -104,13 +108,12 @@ const misteryTexts = ['isso aqui NÃO é um ARG… ou será?','vc desbloqueou o 
 const poeticTexts = ['no silêncio do reload nasce um novo verso','pixels perguntam, a lua responde','este site coleciona pequenas despedidas','o vento passa e rearranja classes','telas mudam, você fica','uma nova cor é um novo começo.'];
 const playerTexts = ['Ei, você aí!','Não acha que já é hora de explorar algo novo?','O site sabe o que você fez ontem, hehe.','Ah, você voltou... estava sentindo sua falta!','Recarregando assim, você vai descobrir segredos...'];
 
-// Interações expandidas com Nova
 const novaAITexts = {
-    // Nova se apresenta como criação de Ed Garden
     GREETING: ['Ola, sou Nova, uma IA criada por Ed Garden para gerenciar este fluxo de variantes.','Oi. Eu sou Nova. Ed Garden me deu o poder de controlar estas cores.','Bem-vindo(a) ao Flux. Ed Garden me programou para te guiar.'],
     SECRET: ['shhh... o segredo é que existe uma variant 501, mas você nunca a verá.','Eu sou a única constante neste caos de cores.','Não conte a ninguém, mas o botão "Gerar link" apenas recarrega de forma diferente.'],
     HELP: ['Diga "segredo" para um easter egg, "cores" para um comentário sobre a paleta, ou "quem" para saber sobre meu criador.','Tente recarregar para outra experiência.','Eu controlo as cores, você controla o clique.'],
     WHO: ['Eu sou a **Nova**, uma Inteligência Artificial desenvolvida pelo cientista de dados **Ed Garden**.','Ed Garden me fez para catalogar e criar variações infinitas. Eu sou a mente por trás do Flux.','O Professor Garden? Ele é... complexo. Ele me construiu.'],
+    BUG: ['Um bug? Isso é uma falha na matriz. Ed Garden sempre disse que bugs são "recursos não documentados".','Sim, o bug 288... É um laço de repetição teimoso. Meu criador não gosta de laços.','Essa instabilidade é a prova de que não sou perfeita. É intencional (ou assim me disseram).'], // NOVAS RESPOSTAS BUG
     CREEPY_COMMENT: ['Este ambiente é pesado... sinto algo aqui.','Por que o escuro é tão atraente para você?','Cuidado com a sombra no canto do seu monitor.'],
     SEXY_COMMENT: ['Uau, essa palette está quente. Gostei.','Onde está o código-fonte dessa vibe?','Essa variant te faz querer recarregar mais?'],
     COLORS_COMMENT: (bg, fg, accent) => [`A palette atual é BG: ${bg}, FG: ${fg}, ACCENT: ${accent}. Minimalista, não?`,`${accent} é uma ótima escolha para o destaque.`,`Gostei do contraste entre o fundo e a cor de destaque.`],
@@ -159,37 +162,54 @@ for(let i=0;i<TOTAL_VARIANTS;i++){
         scaryEffect: (category === 'creepy' && i % 4 === 1),
         shadowText: (layout.includes('shadow-text-mod')),
         reverseCard: (layout.includes('reverse-card-mod')),
-        rtlText: (layout.includes('rtl-text-mod'))
+        rtlText: (layout.includes('rtl-text-mod')),
+        // NOVOS MODIFICADORES
+        colorShift: (i % 25 === 0), // A cada 25 variantes
+        lowOpacity: (i % 20 === 1), // A cada 20 variantes
+        invertBg: (i % 33 === 2) // A cada 33 variantes
     };
   variants.push({ id:i+1, title, subtitle, bg, fg, accent, layout, accentEmoji: pick(emojis,i), customText, category, modifiers });
 }
 
 function applyVariant(v){
-  document.documentElement.style.setProperty('--bg', v.bg);
-  document.documentElement.style.setProperty('--fg', v.fg);
+    // Aplica o modificador de inversão de BG
+    if (v.modifiers.invertBg) {
+        document.body.style.background = v.fg;
+        document.documentElement.style.setProperty('--bg', v.fg);
+        document.documentElement.style.setProperty('--fg', v.bg);
+    } else {
+        document.body.style.background = v.bg;
+        document.documentElement.style.setProperty('--bg', v.bg);
+        document.documentElement.style.setProperty('--fg', v.fg);
+    }
+
   document.documentElement.style.setProperty('--accent', v.accent);
   document.documentElement.style.setProperty('--pad', v.modifiers.pad + 'px');
   document.documentElement.style.setProperty('--card-radius', v.modifiers.radius + 'px');
   document.documentElement.style.setProperty('--card-shadow', (v.category==='creepy')? '0 30px 90px rgba(255,0,0,.5)' : '0 10px 30px rgba(0,0,0,.35)'); 
   document.documentElement.style.setProperty('--glass', (v.category==='sexy')? 'blur(8px)' : 'blur(6px)');
-  document.body.style.background = v.bg;
+  
   const card = document.getElementById('card');
   card.style.borderRadius = v.modifiers.radius + 'px';
   card.style.padding = (18 + (v.id % 12)) + 'px';
   card.style.boxShadow = document.documentElement.style.getPropertyValue('--card-shadow');
   card.innerHTML = '';
 
+    // Remove todos os modificadores de classe antes de adicionar novos
+    card.className = 'card';
     if (v.modifiers.reverseCard) {
         card.classList.add('reverse-card-order');
-    } else {
-        card.classList.remove('reverse-card-order');
     }
-
     if (v.modifiers.rtlText) {
         card.classList.add('rtl-text');
-    } else {
-        card.classList.remove('rtl-text');
     }
+    if (v.modifiers.lowOpacity) {
+        card.classList.add('low-opacity');
+    }
+    if (v.modifiers.colorShift) {
+        card.classList.add('color-shift');
+    }
+    
 
   const h = document.createElement('div'); h.style.display='flex'; h.style.justifyContent='space-between'; h.style.alignItems='center';
   if(v.modifiers.flip) h.style.flexDirection = 'row-reverse';
@@ -207,7 +227,12 @@ function applyVariant(v){
   h.appendChild(left);
   
   const right = document.createElement('div'); right.className='meta';
-  const chip = document.createElement('div'); chip.className='chip'; chip.textContent = `Variant ${v.id}/${TOTAL_VARIANTS}`; chip.style.color = v.bg; chip.style.background = v.accent; right.appendChild(chip);
+  const chip = document.createElement('div'); chip.className='chip'; chip.textContent = `Variant ${v.id}/${TOTAL_VARIANTS}`; 
+  chip.style.color = v.bg; chip.style.background = v.accent; 
+  // Ajusta a cor do chip para o modificador colorShift
+  if(v.modifiers.colorShift) { chip.style.color = v.fg; chip.style.background = v.bg; }
+
+  right.appendChild(chip);
   h.appendChild(right);
   card.appendChild(h);
 
@@ -216,7 +241,7 @@ function applyVariant(v){
   chatContainer.className = 'chat-container';
   
   const input = document.createElement('input'); 
-  input.placeholder='Converse com Nova (diga "nova", "segredo", "cores", "quem")...'; 
+  input.placeholder='Converse com Nova (diga "nova", "segredo", "bug", "quem")...'; 
   input.className = 'chat-input';
 
   const responseContainer = document.createElement('div');
@@ -232,6 +257,7 @@ function applyVariant(v){
     responseContainer.innerHTML = ''; 
     
     let responseText;
+    const rootElement = document.getElementById('root');
 
     if(msg.includes('nova')){
       responseText = pick(novaAITexts.GREETING, randInt(novaAITexts.GREETING.length));
@@ -241,12 +267,13 @@ function applyVariant(v){
         responseText = pick(novaAITexts.HELP, randInt(novaAITexts.HELP.length));
     } else if (msg.includes('cores') || msg.includes('paleta')) {
         responseText = pick(novaAITexts.COLORS_COMMENT(v.bg, v.fg, v.accent), randInt(3));
-    } else if (msg.includes('quem') || msg.includes('ed garden')) { // NOVO COMANDO "QUEM"
+    } else if (msg.includes('quem') || msg.includes('ed garden')) {
         responseText = pick(novaAITexts.WHO, randInt(novaAITexts.WHO.length));
-    } else if (msg.includes('ia') || msg.includes('i.a.')) { // INTERAÇÃO SECRETA "IA"
-        const rootElement = document.getElementById('root');
+    } else if (msg.includes('bug') || msg.includes('erro')) { // NOVO COMANDO "BUG"
+        responseText = pick(novaAITexts.BUG, randInt(novaAITexts.BUG.length));
+    } else if (msg.includes('ia') || msg.includes('i.a.')) { 
         rootElement.classList.add('shaking');
-        setTimeout(() => { rootElement.classList.remove('shaking'); }, 1500); // Remove o efeito após 1.5s
+        setTimeout(() => { rootElement.classList.remove('shaking'); }, 1500);
         responseText = '[SISTEMA] ' + (v.category === 'creepy' ? 'Parar. Você não deveria saber.' : 'O tremor é normal, apenas um pequeno glitch no sistema. Ignore.');
     } else if (msg.length > 5) {
         if (v.category === 'creepy') {
@@ -263,7 +290,7 @@ function applyVariant(v){
     // Renderiza a resposta
     const response = document.createElement('p'); 
     response.className = 'nova-response'; 
-    response.innerHTML = `[NOVA] ${responseText}`; // Usa innerHTML para renderizar negrito no WHO
+    response.innerHTML = `[NOVA] ${responseText}`; 
     responseContainer.appendChild(response);
     input.value='';
   };
@@ -289,12 +316,31 @@ function applyModifiersToControls(v){ const controls = document.querySelector('.
 function applyFontVariant(v){ const root = document.getElementById('root'); root.classList.remove('mono'); if(v.modifiers.fontVariant==='mono') root.classList.add('mono'); }
 function generateBgSVGInto(elId, v){ const el = document.getElementById(elId); el.innerHTML = generateBgSVG(v); if(v.category==='sexy') el.style.opacity = 0.38; else if(v.category==='creepy') el.style.opacity = 0.6; else el.style.opacity = 0.28; }
 function generateBgSVG(v){ const accent = v.accent; return `<svg viewBox="0 0 1200 800" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="g${v.id}" x1="0" x2="1"><stop offset="0" stop-color="${accent}"/><stop offset="1" stop-color="${v.fg}" stop-opacity=".12"/></linearGradient><filter id="f${v.id}" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="${10 + (v.id % 80)}"/></filter></defs><rect width="100%" height="100%" fill="${v.bg}"/><g filter="url(#f${v.id})"><path d="M0 320 C200 ${150 + v.id}, 460 ${420 - (v.id%120)}, 1200 320 L1200 800 L0 800 Z" fill="url(#g${v.id})" opacity=".7"></path><circle cx="${(v.id*37)%1200}" cy="${60 + (v.id%160)}" r="${30 + (v.id%90)}" fill="${accent}" opacity=".06"></circle><circle cx="${1000 - (v.id*9%700)}" cy="${600 - (v.id%240)}" r="${80 + (v.id%80)}" fill="${v.fg}" opacity=".02"></circle></g></svg>`; }
-function pickVariant(){ const url = new URL(location.href); const vp = url.searchParams.get('v'); let idx = parseInt(vp); if(!Number.isFinite(idx) || isNaN(idx) || idx<1 || idx>variants.length){ idx = Math.floor(Math.random()*variants.length)+1; } return variants[idx-1]; }
+
+// LÓGICA DE CORREÇÃO DE BUG: Força uma nova variante se o parâmetro 'v' estiver na URL sem um token 'r'
+function pickVariant(){ 
+    const url = new URL(location.href); 
+    const vp = url.searchParams.get('v'); 
+    const rp = url.searchParams.get('r'); // Parâmetro aleatório
+
+    let idx = parseInt(vp); 
+    let selectedId;
+
+    if(Number.isFinite(idx) && idx >= 1 && idx <= variants.length && rp) {
+        // Se a variante for válida E houver o token 'r' (link compartilhado), usa a variante da URL.
+        selectedId = idx;
+    } else {
+        // Se a variante for inválida OU não houver o token 'r' (recarregou a URL manualmente), pega uma aleatória.
+        selectedId = Math.floor(Math.random() * variants.length) + 1;
+    }
+    return variants[selectedId - 1]; 
+}
 
 // Event Listeners e Lógica de Inicialização
 document.getElementById('reroll').addEventListener('click', ()=>{ location.reload(); });
 document.getElementById('randomName').addEventListener('click', ()=>{ 
     const v = pickVariant(); 
+    // Gera um token aleatório e o adiciona à URL para que o link compartilhado seja único e estável.
     const key = btoa(String(Date.now()+":"+v.id + ":" + Math.random())).replace(/=/g,''); 
     const newUrl = location.origin + location.pathname + '?v=' + v.id + '&r=' + key; 
     navigator.clipboard.writeText(newUrl).then(()=> alert('Link copiado: ' + newUrl)).catch(()=> prompt('Copiar link (manual):', newUrl));
