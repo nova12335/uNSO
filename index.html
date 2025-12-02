@@ -6,17 +6,38 @@
 <style>
     body {
         margin: 0;
-        font-family: Arial, sans-serif;
-        transition: 0.3s;
+        font-family: 'Arial', sans-serif;
+        transition: all 0.5s;
+        overflow: hidden;
     }
     .container {
-        padding: 30px;
-        transition: all 0.3s;
+        padding: 50px;
+        text-align: center;
+        transition: all 0.5s;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
     }
-    input, button {
-        padding: 10px;
-        font-size: 16px;
-        margin-top: 10px;
+    h1 {
+        margin-bottom: 20px;
+    }
+    p {
+        font-size: 20px;
+        max-width: 800px;
+        line-height: 1.5;
+    }
+    .confetti-piece {
+        position: fixed;
+        width: 10px;
+        height: 10px;
+        background: red;
+        animation: confettiFall 3s linear infinite;
+    }
+    @keyframes confettiFall {
+        0% { transform: translateY(0) rotate(0deg); }
+        100% { transform: translateY(100vh) rotate(360deg); }
     }
 </style>
 </head>
@@ -24,92 +45,198 @@
 <div id="app"></div>
 
 <script>
+function getRandom(min, max){ return Math.floor(Math.random()*(max-min)+min); }
+
 const funnyTexts = [
-    "cara q tedio.", "bro sla", "quero sair daq pls", "kkk serio?", "na moral...", 
-    "wtf bro", "isso é hilario", "mano, socorro", "ta loko?", "rip minha vida", 
-    "so um minutinho pls", "oquei...", "bem estranho isso", "aff q saco", 
-    "lol q aleatorio", "pq n?", "ai meu deus", "tenso isso", "que viagem", 
-    "meh", "fudeu", "kkkkk", "wtf real", "vlw mano", "so q rindo"
+    "cara q tedio. mano to rindo sozinho aqui, serio kkkk",
+    "bro sla, n to entendendo nada, mas ta hilario",
+    "quero sair daq pls, isso ta mto estranho e engraçado ao mesmo tempo",
+    "kkk serio? nunca vi algo assim",
+    "na moral... ta loko isso aq",
+    "wtf bro, nao sei nem o q dizer",
+    "isso é hilario, n aguento",
+    "mano, socorro, mas rindo mt",
+    "ta loko? socorro kkkk",
+    "rip minha vida, mas vlw pelo entretenimento",
+    "so um minutinho pls, to processando a loucura",
+    "oquei... td isso é real mesmo?",
+    "bem estranho isso, mas fascinante",
+    "aff q saco, mas to rindo",
+    "lol q aleatorio, n esperava isso",
+    "pq n? ta divertido msm",
+    "ai meu deus, to confuso e rindo",
+    "tenso isso, n to preparado",
+    "que viagem, n sei se rio ou choro",
+    "meh, mas continua curioso",
+    "fudeu, mas divertido",
+    "kkkkk n sei pq mas to rindo",
+    "wtf real, isso ta loco",
+    "vlw mano, surreal",
+    "so q rindo, n to acreditando"
 ];
 
 const sexyTexts = [
-    "hum, olha só...", "vc ta de boa?", "hmmm", "só observando...", 
-    "vibe intensa", "so sexy", "pq n testar?", "ai ai", "quer ver?", "bro pls", 
-    "ta quente aq", "hehehe", "confesso q...", "quero mais", "so vibes", 
-    "se liga", "top demais", "so pra ti", "hahaha...", "realmente...", 
-    "oi oi", "so olhando msm", "bro kkk", "slk q vibes", "vibe loka"
+    "hum, olha só... vc ta percebendo como esse site gosta de vc?",
+    "vc ta de boa? pq parece q ele só quer chamar atenção pra vc",
+    "hmmm, so observando seus movimentos na tela... curioso n?",
+    "só observando... e confesso, ta ficando interessante",
+    "vibe intensa aqui, confesso q to gostando do jeito q vc olha",
+    "so sexy, e o site parece saber disso kkk",
+    "pq n testar os limites? o site ta te provocando hehe",
+    "ai ai, olha isso, parece q ele quer flertar contigo",
+    "quer ver? olha cada detalhe... so pra vc",
+    "bro pls, n to brincando, o site ta te notando",
+    "ta quente aq, cada cor parece pra vc",
+    "hehehe, n to sozinho, mas ta parecendo...",
+    "confesso q... ta ficando interessante",
+    "quero mais, quero ver sua reação",
+    "so vibes, ta sentindo essa tensão?",
+    "se liga, cada variant é um jogo de sedução",
+    "top demais, mas n conte pra ninguem hehe",
+    "so pra ti, perceba os detalhes",
+    "hahaha... ta percebendo q ele te flerta?",
+    "realmente... n da pra ignorar",
+    "oi oi, olha oq eu posso fazer com cores e movimentos",
+    "so olhando msm, mas a atenção é toda sua",
+    "bro kkk, o site sabe q vc ta aqui",
+    "slk q vibes, n da pra resistir",
+    "vibe loka, ta sentindo isso?"
 ];
 
 const creepyTexts = [
-    "voce me viu?", "ta sozinho?", "nao desligue...", "sigo vc", "escuto td", 
-    "tem alguem aq", "nao olhe atras", "segue silencioso", "q som foi aquele?", 
-    "soh um teste", "vc lembra de mim?", "ta frio aq", "algo te observa", 
-    "nao respire", "sussurros...", "cara, medo", "shhh", "n tao seguro", 
-    "vem comigo", "ta me ouvindo?", "isso n é normal", "ninguém sabe", 
-    "soh eu sei", "oq sente?", "tá sentindo isso?", "final chegando"
+    "voce me viu? eu to observando cada movimento seu...",
+    "ta sozinho? cuidado, pq n esta sozinho como pensa",
+    "nao desligue... ainda n acabou",
+    "sigo vc em cada scroll, cada click",
+    "escuto td oq vc digita... mentira, mas parece real",
+    "tem alguem aq, algo estranho no fundo",
+    "nao olhe atras, serio mesmo",
+    "segue silencioso, vc sente?",
+    "q som foi aquele? n olhe agora",
+    "soh um teste, mas ta ficando real",
+    "vc lembra de mim? n, mas ta perto",
+    "ta frio aq, sinto algo se aproximar",
+    "algo te observa, nao pisque",
+    "cara, medo, mas divertido",
+    "shhh... n fale nada",
+    "n tao seguro, mas curiosidade domina",
+    "vem comigo, mas n se mova",
+    "ta me ouvindo? hehe, talvez sim",
+    "isso n é normal, mas fascinante",
+    "ninguém sabe, mas eu sei",
+    "soh eu sei oq acontece aqui",
+    "oq sente? frio? calor? n importa",
+    "final chegando, prepare-se",
+    "algo se move, mas n veja",
+    "as sombras respiram..."
 ];
 
 const secretTexts = [
-    "algo estranho aq", "parece controlado", "ninguém percebe", "mas eu sei", 
-    "novo teste online", "coisas mudam rapido", "oq vc ta vendo?", 
-    "isso parece vivo", "tudo ta conectado", "n sabe ainda", "nao diga nada", 
-    "algo mais por tras", "sistema observando", "oq n foi dito", 
-    "historias antigas", "vc percebeu?", "segredo antigo", "nova ta olhando", 
-    "não se engane", "isso muda td", "olha de novo", "ninguém fala", 
-    "coisas sumem", "como sempre", "wow final cabo", "só vc sabe"
+    "algo estranho aq, mas n percebe? oq ta por tras disso tudo",
+    "parece controlado, mas ta escondido",
+    "ninguém percebe, mas alguem observa",
+    "mas eu sei oq acontece por aqui",
+    "novo teste online, n conte pra ninguem",
+    "coisas mudam rapido, mas vcs n veem",
+    "oq vc ta vendo? apenas metade do que existe",
+    "isso parece vivo, pq ta mudando?",
+    "n sabe ainda, mas algo controla",
+    "nao diga nada, so observe",
+    "algo mais por tras, invisivel",
+    "sistema observando, mas n reage",
+    "oq n foi dito, ta acontecendo",
+    "historias antigas escondidas aqui",
+    "vc percebeu? ta tudo ligado",
+    "segredo antigo, n toque nisso",
+    "nova ta olhando, mas n diz nada",
+    "não se engane, nada é aleatorio",
+    "isso muda td sem avisar",
+    "olha de novo, perceba detalhes",
+    "ninguém fala sobre isso",
+    "coisas sumem, ou parecem",
+    "como sempre, controlado",
+    "wow final cabo, ultima linha",
+    "só vc sabe oq acontece..."
 ];
 
-// Combina todas
 const allTexts = funnyTexts.concat(sexyTexts, creepyTexts, secretTexts);
 
 const variants = [];
 
-for(let i=1; i<=100; i++){
+for(let i=1;i<=100;i++){
     variants.push({
         id: i,
-        category: i<=25 ? "Funny" : i<=50 ? "Sexy" : i<=75 ? "Creepy" : "Secret",
+        category: i<=25?"Funny":i<=50?"Sexy":i<=75?"Creepy":"Secret",
         text: allTexts[i-1],
         generateHTML: function(){
-            // cores aleatorias
-            const bg = `hsl(${Math.random()*360}, ${40+Math.random()*60}%, ${20+Math.random()*60}%)`;
-            const color = `hsl(${Math.random()*360}, ${40+Math.random()*60}%, ${70+Math.random()*20}%)`;
-            const fontSize = 14 + Math.floor(Math.random()*16);
-            const padding = 20 + Math.floor(Math.random()*50);
-
-            return `
-            <div class="container" style="
-                background: ${bg};
-                color: ${color};
-                font-size: ${fontSize}px;
-                padding: ${padding}px;
-                border-radius: ${Math.floor(Math.random()*50)}px;
+            const bg = `hsl(${getRandom(0,360)}, ${getRandom(50,80)}%, ${getRandom(30,70)}%)`;
+            const color = `hsl(${getRandom(0,360)}, ${getRandom(50,100)}%, ${getRandom(50,90)}%)`;
+            const fontFamily = ['Arial','Verdana','Comic Sans MS','Courier New','Georgia'][getRandom(0,5)];
+            const borderRadius = getRandom(0,50);
+            const padding = getRandom(50,150);
+            const effects = [];
+            
+            // Adiciona efeitos especiais em algumas variants
+            if(this.id%10===0){
+                effects.push('confetti');
+            }
+            if(this.id%15===0){
+                effects.push('darken');
+            }
+            if(this.id%20===0){
+                effects.push('glitch');
+            }
+            
+            let html = `<div class="container" style="
+                background:${bg};
+                color:${color};
+                font-family:${fontFamily};
+                border-radius:${borderRadius}px;
+                padding:${padding}px;
+                text-shadow: 1px 1px 2px black;
+                transform: rotate(${getRandom(-2,2)}deg);
             ">
                 <h1>Variant ${this.id} (${this.category})</h1>
                 <p>${this.text}</p>
-                <input id="userInput" placeholder="Digite algo...">
-                <button onclick="send()">Enviar</button>
-                <p id="result"></p>
-            </div>
-            `;
+            </div>`;
+            
+            // adiciona efeitos
+            if(effects.includes('confetti')){
+                html += `<script>
+                    for(let i=0;i<100;i++){
+                        let c = document.createElement('div');
+                        c.className='confetti-piece';
+                        c.style.left=Math.random()*100+'vw';
+                        c.style.background='hsl('+Math.random()*360+',80%,60%)';
+                        c.style.animationDuration=(2+Math.random()*2)+'s';
+                        document.body.appendChild(c);
+                    }
+                </script>`;
+            }
+            if(effects.includes('darken')){
+                html += `<div style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);pointer-events:none;"></div>`;
+            }
+            if(effects.includes('glitch')){
+                html += `<style>
+                    @keyframes glitch{
+                        0%{transform: translate(0,0);}
+                        20%{transform: translate(-5px,5px);}
+                        40%{transform: translate(5px,-5px);}
+                        60%{transform: translate(-5px,5px);}
+                        80%{transform: translate(5px,-5px);}
+                        100%{transform: translate(0,0);}
+                    }
+                    .container{animation: glitch 1s infinite;}
+                </style>`;
+            }
+            
+            return html;
         }
     });
 }
 
-// palavras aleatorias pro chat
-const randomWords = [
-    "Neblina", "Trovão", "Abismo", "Luz", "Eco", "Vidro", "Marfim", 
-    "Pixel", "Estouro", "Lamento", "Fragmento", "Raiz", "Sintético",
-    "Fragmento", "Gelo", "Fumaça", "Sombra", "Caos", "Glitch", "Vortex"
-];
-
-// escolhe variant
-const variant = variants[Math.floor(Math.random()*variants.length)];
+const variant = variants[getRandom(0,variants.length)];
 document.getElementById("app").innerHTML = variant.generateHTML();
-
-function send(){
-    const word = randomWords[Math.floor(Math.random()*randomWords.length)];
-    document.getElementById("result").innerText = "Resposta: " + word;
-}
 </script>
 </body>
 </html>
