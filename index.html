@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Vai Dormir</title>
+  <title>ja pensou em se matar?</title>
   <style>
     /* Variáveis CSS padrão */
     :root{--bg:#111;--fg:#eee;--accent:#ff6;--pad:32px;--card-radius:18px;--card-shadow:0 10px 30px rgba(0,0,0,.4);--glass:blur(6px);--accent-rgb: 255, 255, 102} /* default fallback RGB */
@@ -101,7 +101,7 @@
     .color-shift { color: var(--bg) !important; background-color: var(--accent) !important; }
     .color-shift h1, .color-shift p { color: var(--bg) !important; }
 
-    /* NOVO: Estilo para Shutdown */
+    /* Estilo para Shutdown */
     .shutdown {
         position: fixed;
         inset: 0;
@@ -241,21 +241,27 @@ for(let i=0;i<TOTAL_VARIANTS;i++){
 }
 
 function triggerShutdown() {
-    // 1. Esconde a interface principal
+    // 1. Esconde a interface principal (root)
     document.getElementById('root').style.transition = 'opacity 0.5s ease-in';
     document.getElementById('root').style.opacity = '0';
     document.querySelector('.controls').style.display = 'none';
 
-    // 2. Ativa a tela de shutdown
+    // 2. NOVO: Desativa o input e o botão para impedir qualquer interação.
+    const inputElement = document.querySelector('.chat-input');
+    const sendButton = document.getElementById('sendBtn'); 
+    if (inputElement) inputElement.disabled = true;
+    if (sendButton) sendButton.disabled = true;
+
+    // 3. Ativa a tela de shutdown
     const shutdownScreen = document.getElementById('shutdownScreen');
     shutdownScreen.classList.add('active');
 
-    // 3. Impede reloads (opcional, mas dramático)
+    // 4. Impede reloads (opcional, mas dramático)
     window.onbeforeunload = function() {
         return "Conexão encerrada. Deseja sair do terminal?";
     };
 
-    // 4. Bloqueia a execução de mais JS
+    // 5. Bloqueia a execução de mais JS
     console.error("ALERTA: Violação de protocolo detectada. Sessão encerrada.");
 }
 
@@ -357,6 +363,7 @@ function applyVariant(v){
     input.className = 'chat-input';
 
     const sendBtn = document.createElement('button'); 
+    sendBtn.id = 'sendBtn'; // ID adicionado para o triggerShutdown funcionar
     sendBtn.textContent='Enviar'; 
     sendBtn.style.color = v.bg; 
     sendBtn.style.background = v.accent; 
@@ -364,8 +371,8 @@ function applyVariant(v){
         const msg = input.value.toLowerCase().trim();
         responseContainer.innerHTML = ''; 
         
-        // NOVO: GATILHO DE SHUTDOWN ANTES DE TUDO
-        const shutdownRegex = /\b(matar|kill|morra|burra|idiota|lixo|inútil|tosca|shutdown|desligar|encerrar|foda-se|merda)\b/i;
+        // GATILHO DE SHUTDOWN ANTES DE TUDO
+        const shutdownRegex = /\b(matar|kill|morra|burra|idiota|lixo|inútil|tosca|shutdown|desligar|encerrar|foda-se|merda|player)\b/i; // Adicionado 'player'
         if (msg.match(shutdownRegex)) {
             triggerShutdown();
             return; // Encerra a função imediatamente
@@ -511,6 +518,9 @@ document.getElementById('debugToggle').addEventListener('click', ()=>{
 
 // Inicialização: Aplica a variant ao carregar a página
 document.addEventListener('DOMContentLoaded', () => {
+    // Garante que a tela de shutdown não esteja visível ao carregar
+    document.getElementById('shutdownScreen').classList.remove('active');
+    
     const initialVariant = pickVariant();
     applyVariant(initialVariant);
 });
