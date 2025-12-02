@@ -2,125 +2,105 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Variant Site Remake</title>
+<title>Mini Simulador de Vida</title>
 <style>
-    body {
-        margin: 0;
-        font-family: 'Arial', sans-serif;
-        overflow: hidden;
-        transition: background 0.5s;
-    }
-    .container {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        text-align: center;
-        color: white;
-        text-shadow: 1px 1px 2px black;
-        padding: 50px;
-        transition: all 0.5s;
-    }
-    h1 {
-        font-size: 3em;
-        margin-bottom: 20px;
-    }
-    p {
-        font-size: 1.5em;
-        max-width: 800px;
-        line-height: 1.5;
-        margin: 10px 0;
-        white-space: pre-wrap;
-    }
-    .confetti-piece {
-        position: fixed;
-        width: 10px;
-        height: 10px;
-        background: red;
-        animation: confettiFall 3s linear infinite;
-    }
-    @keyframes confettiFall {
-        0% { transform: translateY(0) rotate(0deg); }
-        100% { transform: translateY(100vh) rotate(360deg); }
-    }
-    .glitch {
-        animation: glitchAnim 1s infinite;
-    }
-    @keyframes glitchAnim {
-        0%{transform: translate(0,0);} 20%{transform: translate(-5px,5px);} 40%{transform: translate(5px,-5px);} 60%{transform: translate(-5px,5px);} 80%{transform: translate(5px,-5px);} 100%{transform: translate(0,0);}
-    }
+  body {
+    font-family: 'Courier New', monospace;
+    background: linear-gradient(to bottom, #0f0f0f, #1a1a1a);
+    color: #00ff99;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    padding: 20px;
+  }
+  #gameBox {
+    background: rgba(0,0,0,0.7);
+    padding: 20px;
+    border-radius: 15px;
+    max-width: 600px;
+    text-align: center;
+    box-shadow: 0 0 20px #00ff99;
+  }
+  button {
+    margin: 10px;
+    padding: 10px 20px;
+    background: #00ff99;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  button:hover {
+    background: #00cc77;
+  }
 </style>
 </head>
 <body>
-<div id="app"></div>
+  <h1>Mini Simulador de Vida</h1>
+  <div id="gameBox">
+    <p id="story">Bem-vindo ao mundo! Você acorda em um quarto estranho. O que você faz?</p>
+    <div id="choices">
+      <button onclick="makeChoice(1)">Olhar pela janela</button>
+      <button onclick="makeChoice(2)">Explorar o quarto</button>
+    </div>
+  </div>
+
 <script>
-function getRandom(min, max){ return Math.floor(Math.random()*(max-min)+min); }
+let state = 0;
 
-const categories = ['Funny','Sexy','Creepy','Secret'];
+function makeChoice(choice) {
+  const story = document.getElementById('story');
+  const choices = document.getElementById('choices');
 
-// Funções para gerar frases curtas de exemplo para cada categoria
-function generateText(category){
-    const texts = {
-        Funny: ["cara q tedio. mano to rindo sozinho kkk","bro sla, n to entendendo nada, mas ta hilario"],
-        Sexy: ["hum, olha só... vc ta percebendo como esse site gosta de vc?","vc ta de boa? pq parece q ele só quer chamar atenção pra vc"],
-        Creepy: ["voce me viu? eu to observando cada movimento seu...","ta sozinho? cuidado, n esta sozinho como pensa"],
-        Secret: ["algo estranho aq, mas n percebe? oq ta por tras disso tudo","parece controlado, mas ta escondido"]
-    };
-    return texts[category][getRandom(0,texts[category].length)];
+  if(state === 0) {
+    if(choice === 1) {
+      story.innerText = "Você vê uma cidade futurista iluminada por néon. Um som estranho vem da rua.";
+      choices.innerHTML = '<button onclick="makeChoice(3)">Sair para investigar</button><button onclick="makeChoice(4)">Ignorar e voltar para a cama</button>';
+      state = 1;
+    } else {
+      story.innerText = "Você encontra um diário antigo com símbolos estranhos. Parece que algo quer falar com você.";
+      choices.innerHTML = '<button onclick="makeChoice(5)">Ler o diário</button><button onclick="makeChoice(6)">Ignorar e explorar o corredor</button>';
+      state = 2;
+    }
+  } 
+  else if(state === 1) {
+    if(choice === 3) {
+      story.innerText = "Ao sair, um NPC estranho aparece e diz: 'Finalmente você chegou! Estávamos te esperando.'";
+      choices.innerHTML = '<button onclick="makeChoice(7)">Seguir o NPC</button><button onclick="makeChoice(8)">Correr para a rua</button>';
+      state = 3;
+    } else {
+      story.innerText = "Você volta para a cama e adormece. Talvez o mundo esteja esperando você acordar...";
+      choices.innerHTML = '<button onclick="restartGame()">Recomeçar</button>';
+    }
+  }
+  else if(state === 2) {
+    if(choice === 5) {
+      story.innerText = "As palavras do diário começam a brilhar! Você sente que ganhou conhecimento secreto.";
+      choices.innerHTML = '<button onclick="makeChoice(9)">Usar o conhecimento para abrir uma porta secreta</button><button onclick="makeChoice(10)">Guardar o diário e sair</button>';
+      state = 4;
+    } else {
+      story.innerText = "O corredor leva a uma porta trancada. Ouve-se passos se aproximando...";
+      choices.innerHTML = '<button onclick="makeChoice(11)">Esconder-se</button><button onclick="makeChoice(12)">Abrir a porta</button>';
+      state = 5;
+    }
+  }
+  else {
+    // Finais simples
+    story.innerText = "Sua jornada continua... Mas isso é só o começo da sua história!";
+    choices.innerHTML = '<button onclick="restartGame()">Recomeçar</button>';
+  }
 }
 
-function generateVariant(){
-    const category = categories[getRandom(0,categories.length)];
-    const color1 = `hsl(${getRandom(0,360)}, ${getRandom(50,80)}%, ${getRandom(40,60)}%)`;
-    const color2 = `hsl(${getRandom(0,360)}, ${getRandom(50,80)}%, ${getRandom(40,60)}%)`;
-    document.body.style.background = `linear-gradient(135deg, ${color1}, ${color2})`;
-
-    const container = document.createElement('div');
-    container.className='container';
-    container.style.fontFamily=['Arial','Verdana','Comic Sans MS','Courier New','Georgia'][getRandom(0,5)];
-    if(getRandom(0,5)===0) container.classList.add('glitch');
-    container.style.transform=`rotate(${getRandom(-2,2)}deg)`;
-
-    const h1 = document.createElement('h1');
-    h1.textContent = `Variant ${getRandom(1,101)} (${category})`;
-    const p = document.createElement('p');
-    p.textContent = generateText(category);
-
-    container.appendChild(h1);
-    container.appendChild(p);
-
-    const app = document.getElementById('app');
-    app.innerHTML='';
-    app.appendChild(container);
-
-    // Confetti efeito aleatório
-    if(getRandom(0,5)===0){
-        for(let i=0;i<50;i++){
-            const c=document.createElement('div');
-            c.className='confetti-piece';
-            c.style.left=Math.random()*100+'vw';
-            c.style.background=`hsl(${Math.random()*360},80%,60%)`;
-            c.style.animationDuration=(2+Math.random()*2)+'s';
-            document.body.appendChild(c);
-        }
-    }
-
-    // Dark overlay aleatório
-    if(getRandom(0,6)===0){
-        const d=document.createElement('div');
-        d.style.position='fixed';
-        d.style.top='0';
-        d.style.left='0';
-        d.style.width='100%';
-        d.style.height='100%';
-        d.style.background='rgba(0,0,0,0.7)';
-        d.style.pointerEvents='none';
-        document.body.appendChild(d);
-    }
+function restartGame() {
+  state = 0;
+  document.getElementById('story').innerText = "Bem-vindo ao mundo! Você acorda em um quarto estranho. O que você faz?";
+  document.getElementById('choices').innerHTML = `
+    <button onclick="makeChoice(1)">Olhar pela janela</button>
+    <button onclick="makeChoice(2)">Explorar o quarto</button>
+  `;
 }
-
-generateVariant();
 </script>
 </body>
 </html>
