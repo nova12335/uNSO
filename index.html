@@ -3,17 +3,17 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>150 Variants — Reload para mudar</title>
+  <title>200 Variants — Reload para mudar</title>
   <style>
-    :root{--bg:#111;--fg:#eee;--accent:#ff6;--pad:32px}
+    :root{--bg:#111;--fg:#eee;--accent:#ff6;--pad:32px;--card-radius:18px;--card-shadow:0 10px 30px rgba(0,0,0,.4);--glass:blur(6px)}
     html,body{height:100%;margin:0;font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
     .wrap{min-height:100%;display:flex;align-items:center;justify-content:center;padding:var(--pad);box-sizing:border-box;transition:all .6s ease}
-    .card{max-width:1100px;width:100%;border-radius:18px;padding:28px;box-shadow:0 10px 30px rgba(0,0,0,.4);backdrop-filter: blur(6px);} 
+    .card{max-width:1100px;width:100%;border-radius:var(--card-radius);padding:28px;box-shadow:var(--card-shadow);backdrop-filter:var(--glass);transition:all .45s ease}
     h1{margin:0 0 8px 0;font-size: clamp(20px, 4vw, 44px);letter-spacing:-0.02em}
     p.lead{margin:0 0 18px 0;font-size:clamp(14px,2.2vw,18px);opacity:.92}
     .meta{display:flex;gap:12px;flex-wrap:wrap}
     .chip{padding:8px 12px;border-radius:999px;font-weight:600;background:rgba(255,255,255,.06)}
-    .controls{position:fixed;right:18px;bottom:18px;display:flex;gap:10px}
+    .controls{position:fixed;right:18px;bottom:18px;display:flex;gap:10px;z-index:50}
     button{border:0;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:700}
     /* small helpers used by variants */
     .split{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:center}
@@ -32,6 +32,10 @@
     .glitch::before,.glitch::after{content:attr(data-text);position:absolute;left:0;top:0;right:0}
     .glitch::before{transform:translateX(-2px);opacity:.6}
     .glitch::after{transform:translateX(2px);opacity:.6}
+    .reverse{direction:rtl}
+    .mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', 'Courier New', monospace}
+    .big{font-size: clamp(18px, 3.6vw, 38px)}
+    .smallfoot{font-size:12px;opacity:.7}
   </style>
 </head>
 <body>
@@ -46,19 +50,20 @@
     <button id="reroll">Recarregar → nova variant</button>
     <button id="randomName">Gerar link</button>
     <button id="listBtn">Ver lista (console)</button>
+    <button id="debugToggle">Toggle debug</button>
   </div>
 
 <script>
-// --- generator for 150 variants (keeps style but adds categories/layout changes) ---
+// --- generator for 200 variants — each variant mutates the SITE structure/behavior more dramatically ---
 const palettes = [
   ['#0f172a','#e6edf3','#7c3aed'],['#07121a','#e8fff7','#06b6d4'],['#1a1a1a','#ffeedd','#ff6b6b'],
   ['#08120f','#dff6e9','#22c55e'],['#0b1020','#e6e9ff','#8b5cf6'],['#0f0503','#fff4e6','#ffb020'],
   ['#041224','#e8f6ff','#06b6d4'],['#100d14','#f8eefc','#d946ef'],['#0a0f0a','#f3fff5','#10b981'],
   ['#0f0722','#fff0f6','#fb7185']
 ];
-const emojis = ['✨','⚡','🔥','🌊','🎛️','🖤','🪐','🎇','💥','🔮','🌙','🍷','🥀','😈','👀','💋','🧠','👻','🕯️','🔪'];
+const emojis = ['✨','⚡','🔥','🌊','🎛️','🖤','🪐','🎇','💥','🔮','🌙','🍷','🥀','😈','👀','💋','🧠','👻','🕯️','🔪','🪩','🎭','🩸','🧿','🦇'];
 
-// category-specific texts (sexy, creepy, random, funny, mistery)
+// category-specific texts (sexy, creepy, random, funny, mistery, poetic)
 const sexyTexts = [
   'texto sensual: *passa a mão no código*',
   'a noite é nossa — e o reload também',
@@ -94,137 +99,210 @@ const misteryTexts = [
   'bloxfall é real eu vi',
   'ed garden n teria aprovado isso'
 ];
+const poeticTexts = [
+  'no silêncio do reload nasce um novo verso',
+  'pixels perguntam, a lua responde',
+  'este site coleciona pequenas despedidas',
+  'o vento passa e rearranja classes',
+  'um suspiro de CSS entre as sombras'
+];
 
-// more titles/subtitles to vary flavor
-const subtitles = ['um pequeno experimento que muda a cada recarga','aleatório. diferente. só recarrega.','reload to see something different','feito pra confundir e encantar'];
+// subtitles and layout pool with many structural changes
+const subtitles = ['um experimento que muda a cada recarga','aleatório. diferente. só recarrega.','reload to see something different','feito pra confundir e encantar','cada variant reescreve o site'];
+const layoutPool = ['center','split','tiles','big-header','minimal','fullscreen','glitch','broken','fire-bg','rtl','mono','giant','overlay','split-visual','video-mock','menu-left','hidden-controls','no-card','gradient-grid','bombastic'];
 
-// layouts pool — some variants will change HTML structure or visuals
-const layoutPool = ['center','split','tiles','big-header','minimal','fullscreen','glitch','broken','fire-bg'];
-
-// utility helpers
-function pick(arr, i){ return arr[i % arr.length]; }
-function randChoice(arr, seed){ return arr[Math.abs(seed) % arr.length]; }
-function escapeHtml(unsafe){ if(!unsafe) return ''; return unsafe.replace(/[&<>"]+/g, function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m];}); }
+// helpers
+function pick(arr,i){ return arr[i % arr.length]; }
+function randInt(max){ return Math.floor(Math.random()*max); }
+function escapeHtml(unsafe){ if(!unsafe) return ''; return unsafe.replace(/[&<>"']/g, function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#039;"}[m];}); }
 function truncate(str,n){ if(!str) return ''; return (str.length>n)?str.slice(0,n-1)+'…':str; }
 
-// build 150 variants
+// build 200 variants
 const variants = [];
-for(let i=0;i<150;i++){
+for(let i=0;i<200;i++){
   const p = palettes[i % palettes.length];
   const bg = p[0], fg = p[1], accent = p[2];
-  // category rotation for variety
   let category;
-  if(i % 10 === 1) category = 'sexy';
+  if(i % 11 === 2) category = 'sexy';
   else if(i % 7 === 3) category = 'creepy';
   else if(i % 5 === 2) category = 'mistery';
   else if(i % 3 === 0) category = 'funny';
+  else if(i % 13 === 4) category = 'poetic';
   else category = 'random';
 
-  // choose text from category
   let customText;
-  if(category==='sexy') customText = pick(sexyTexts, i);
-  else if(category==='creepy') customText = pick(creepyTexts, i);
-  else if(category==='mistery') customText = pick(misteryTexts, i);
-  else if(category==='funny') customText = pick(funnyTexts, i);
-  else customText = pick(randomTexts, i);
+  if(category==='sexy') customText = pick(sexyTexts,i);
+  else if(category==='creepy') customText = pick(creepyTexts,i);
+  else if(category==='mistery') customText = pick(misteryTexts,i);
+  else if(category==='funny') customText = pick(funnyTexts,i);
+  else if(category==='poetic') customText = pick(poeticTexts,i);
+  else customText = pick(randomTexts,i);
 
-  // title and subtitle
-  const title = `${pick(emojis, i)} Glimmer ${i+1}`;
-  const subtitle = pick(subtitles, i);
-  // layout that affects structure
-  const layout = pick(layoutPool, i);
+  const title = `${pick(emojis,i)} Flux ${i+1}`;
+  const subtitle = pick(subtitles,i);
+  const layout = pick(layoutPool,i);
 
-  variants.push({
-    id: i+1, title, subtitle, bg, fg, accent, layout, accentEmoji: pick(emojis,i), customText, category
-  });
+  // additional per-variant modifiers to change site more
+  const modifiers = {
+    fontVariant: (i%6===0)?'mono':(i%5===0)?'serif':'system',
+    radius: 8 + (i%30),
+    pad: 16 + (i%40),
+    hideControls: (i%17===0),
+    flip: (i%19===0),
+    bigHeader: (i%23===0)
+  };
+
+  variants.push({ id:i+1, title, subtitle, bg, fg, accent, layout, accentEmoji: pick(emojis,i), customText, category, modifiers });
 }
 
-// main apply function
+// apply function that mutates the site heavily based on variant
 function applyVariant(v){
-  const root = document.documentElement;
-  root.style.setProperty('--bg', v.bg);
-  root.style.setProperty('--fg', v.fg);
-  root.style.setProperty('--accent', v.accent);
-  root.style.setProperty('--pad', (18 + (v.id % 8)*5) + 'px');
+  // global CSS variables
+  document.documentElement.style.setProperty('--bg', v.bg);
+  document.documentElement.style.setProperty('--fg', v.fg);
+  document.documentElement.style.setProperty('--accent', v.accent);
+  document.documentElement.style.setProperty('--pad', v.modifiers.pad + 'px');
+  document.documentElement.style.setProperty('--card-radius', v.modifiers.radius + 'px');
+  document.documentElement.style.setProperty('--card-shadow', (v.category==='creepy')? '0 30px 90px rgba(0,0,0,.7)' : '0 10px 30px rgba(0,0,0,.35)');
+  document.documentElement.style.setProperty('--glass', (v.category==='sexy')? 'blur(8px)' : 'blur(6px)');
   document.body.style.background = v.bg;
+
   const card = document.getElementById('card');
-  card.style.background = 'linear-gradient(135deg, rgba(255,255,255,0.02), rgba(0,0,0,0.06))';
+  card.style.borderRadius = v.modifiers.radius + 'px';
+  card.style.padding = (18 + (v.id % 12)) + 'px';
+  card.style.boxShadow = document.documentElement.style.getPropertyValue('--card-shadow');
   card.innerHTML = '';
 
+  // maybe hide card entirely for some variants
+  if(v.layout==='no-card'){
+    document.getElementById('root').classList.add('reverse');
+    card.style.display = 'none';
+    const full = document.createElement('div'); full.style.padding = '40px'; full.style.color = v.fg; full.innerHTML = `<h1 class='big'>${escapeHtml(v.title)}</h1><p>${escapeHtml(v.customText)}</p>`;
+    document.getElementById('root').appendChild(full);
+    generateBgSVGInto('bg', v);
+    applyModifiersToControls(v);
+    return;
+  }
+
   // header
-  const h = document.createElement('div');
-  h.style.display='flex'; h.style.justifyContent='space-between'; h.style.alignItems='center';
+  const h = document.createElement('div'); h.style.display='flex'; h.style.justifyContent='space-between'; h.style.alignItems='center';
+  if(v.modifiers.flip) h.style.flexDirection = 'row-reverse';
+
   const left = document.createElement('div');
-  const title = document.createElement('h1'); title.className='logo'; title.textContent=`${v.accentEmoji} ${v.title}`; title.style.color = v.fg; left.appendChild(title);
+  const title = document.createElement('h1'); title.className='logo'; title.textContent=`${v.accentEmoji} ${v.title}`; title.style.color = v.fg; if(v.modifiers.bigHeader) title.classList.add('big'); left.appendChild(title);
   const sub = document.createElement('p'); sub.className='lead'; sub.textContent = v.subtitle; sub.style.color = v.fg; left.appendChild(sub);
   h.appendChild(left);
+
   const right = document.createElement('div'); right.className='meta';
-  const chip = document.createElement('div'); chip.className='chip'; chip.textContent = `Variant ${v.id}/150`; chip.style.color = v.bg; chip.style.background = v.accent; right.appendChild(chip); h.appendChild(right);
+  const chip = document.createElement('div'); chip.className='chip'; chip.textContent = `Variant ${v.id}/200`; chip.style.color = v.bg; chip.style.background = v.accent; right.appendChild(chip);
+  // sometimes add an extra action
+  if(v.id % 14 === 0){ const alt = document.createElement('div'); alt.className='chip'; alt.textContent='action'; alt.style.background = 'rgba(255,255,255,.04)'; right.appendChild(alt); }
+  h.appendChild(right);
   card.appendChild(h);
 
-  // layouts (with some that change the site structure/feel)
-  if(v.layout==='center'){
+  // build content based on layout — more extreme transformations
+  const layout = v.layout;
+  if(layout==='center'){
     const c = document.createElement('div'); c.className='center'; c.style.marginTop='22px';
     const big = document.createElement('p'); big.textContent = v.customText; big.style.fontSize='18px'; big.style.color=v.fg; c.appendChild(big);
     const btn = document.createElement('a'); btn.textContent='explorar'; btn.href='#'; btn.className='small'; btn.style.display='inline-block'; btn.style.marginTop='12px'; btn.style.padding='10px 14px'; btn.style.borderRadius='10px'; btn.style.background=v.accent; btn.style.color=v.bg; c.appendChild(btn);
     card.appendChild(c);
-  } else if(v.layout==='split'){
+  } else if(layout==='split' || layout==='split-visual'){
     const s = document.createElement('div'); s.className='split';
     const l = document.createElement('div'); const r = document.createElement('div');
-    l.innerHTML = `<p style="margin-top:0;color:${v.fg}">${escapeHtml(v.customText)}</p>`;
-    r.innerHTML = `<div style="height:140px;border-radius:12px;background:linear-gradient(135deg, ${v.accent}, rgba(255,255,255,0.06));display:flex;align-items:center;justify-content:center"> <strong style="color:${v.bg}">visual</strong></div>`;
+    l.innerHTML = `<p style="margin-top:0;color:${v.fg}">${escapeHtml(v.customText)}</p><p class='smallfoot' style='margin-top:8px;color:${v.fg}'>layout: ${layout}</p>`;
+    // visual or live mock
+    if(layout==='split-visual'){
+      r.innerHTML = `<div style="height:180px;border-radius:12px;background:linear-gradient(135deg, ${v.accent}, rgba(255,255,255,0.06));display:flex;align-items:center;justify-content:center"> <strong style="color:${v.bg}">LIVE MOCK</strong></div>`;
+    } else {
+      r.innerHTML = `<div style="height:140px;border-radius:12px;background:linear-gradient(135deg, ${v.accent}, rgba(255,255,255,0.06));display:flex;align-items:center;justify-content:center"> <strong style="color:${v.bg}">visual</strong></div>`;
+    }
     s.appendChild(l); s.appendChild(r); card.appendChild(s);
-  } else if(v.layout==='tiles'){
+  } else if(layout==='tiles' || layout==='gradient-grid'){
     const tiles = document.createElement('div'); tiles.className='grid-tiles'; tiles.style.marginTop='18px';
-    for(let i=0;i<6;i++){ const t=document.createElement('div'); t.className='tile'; t.style.background=`linear-gradient(180deg, ${v.fg}11, ${v.fg}06)`; t.style.color=v.fg; const snippet=truncate(v.customText,40); t.innerHTML=`<strong>item ${i+1}</strong><div style='opacity:.8;font-size:13px'>${escapeHtml(snippet)}</div>`; tiles.appendChild(t);} card.appendChild(tiles);
-  } else if(v.layout==='big-header'){
-    const big=document.createElement('div'); big.style.marginTop='18px'; big.innerHTML=`<p style='font-size:20px;margin:0;color:${v.fg}'>${escapeHtml(v.customText)}</p>`; card.appendChild(big);
-  } else if(v.layout==='minimal'){
+    const count = (layout==='gradient-grid')?8:6;
+    for(let i=0;i<count;i++){ const t=document.createElement('div'); t.className='tile'; t.style.background=`linear-gradient(180deg, ${v.fg}11, ${v.fg}06)`; t.style.color=v.fg; const snippet=truncate(v.customText,40); t.innerHTML=`<strong>item ${i+1}</strong><div style='opacity:.8;font-size:13px'>${escapeHtml(snippet)}</div>`; tiles.appendChild(t);} card.appendChild(tiles);
+  } else if(layout==='big-header' || layout==='giant'){
+    const big=document.createElement('div'); big.style.marginTop='18px'; big.innerHTML=`<p style='font-size:${layout==='giant'? '32px':'20px'};margin:0;color:${v.fg}'>${escapeHtml(v.customText)}</p>`; card.appendChild(big);
+  } else if(layout==='minimal'){
     const m = document.createElement('div'); m.style.marginTop='18px'; m.innerHTML=`<p style='font-size:16px;margin:0;color:${v.fg};opacity:.9'>${escapeHtml(v.customText)}</p><p style='font-size:12px;margin-top:8px;color:${v.fg};opacity:.6'>minimal layout — menos é mais</p>`; card.appendChild(m);
-  } else if(v.layout==='fullscreen'){
-    // variant that pretends to be a fullscreen app
-    const f = document.createElement('div'); f.style.marginTop='8px'; f.innerHTML=`<div style='padding:28px;border-radius:12px;background:rgba(0,0,0,.18);color:${v.fg}'> <h2 style='margin:0'>${escapeHtml(v.title)}</h2><p style='opacity:.9'>${escapeHtml(v.customText)}</p><div style='height:220px;margin-top:12px;border-radius:8px;background:linear-gradient(180deg, ${v.accent}, rgba(0,0,0,.08));display:flex;align-items:center;justify-content:center'>app view</div></div>`; card.appendChild(f);
-  } else if(v.layout==='glitch'){
+  } else if(layout==='fullscreen' || layout==='video-mock'){
+    const f = document.createElement('div'); f.style.marginTop='8px';
+    f.innerHTML=`<div style='padding:28px;border-radius:12px;background:rgba(0,0,0,.18);color:${v.fg}'> <h2 style='margin:0'>${escapeHtml(v.title)}</h2><p style='opacity:.9'>${escapeHtml(v.customText)}</p><div style='height:220px;margin-top:12px;border-radius:8px;background:linear-gradient(180deg, ${v.accent}, rgba(0,0,0,.08));display:flex;align-items:center;justify-content:center'>${layout==='video-mock'?'video area':'app view'}</div></div>`;
+    card.appendChild(f);
+  } else if(layout==='glitch'){
     const g = document.createElement('div'); g.className='glitch'; g.setAttribute('data-text', v.customText); g.style.marginTop='18px'; g.innerHTML=`<p style='font-size:20px;margin:0;color:${v.fg}'>${escapeHtml(v.customText)}</p>`; card.appendChild(g);
-  } else if(v.layout==='broken'){
+  } else if(layout==='broken'){
     const b = document.createElement('div'); b.style.marginTop='18px'; b.innerHTML=`<p style='font-size:16px;margin:0;color:${v.fg};text-decoration:line-through'>${escapeHtml(v.customText)}</p><p style='opacity:.6;font-size:13px'>corrupted — try reload</p>`; card.appendChild(b);
-  } else if(v.layout==='fire-bg'){
+  } else if(layout==='fire-bg'){
     const fb = document.createElement('div'); fb.style.marginTop='18px'; fb.innerHTML=`<p style='font-size:18px;margin:0;color:${v.fg}'>${escapeHtml(v.customText)}</p><div style='height:140px;border-radius:12px;margin-top:12px;background:linear-gradient(180deg,#ff3e00,#ffb020);box-shadow:0 10px 40px rgba(255,80,20,.12)'></div>`; card.appendChild(fb);
-  } else { // fallback
+  } else if(layout==='rtl'){
+    document.getElementById('root').classList.add('reverse');
+    const rnode = document.createElement('div'); rnode.style.marginTop='18px'; rnode.innerHTML=`<p style='color:${v.fg}'>${escapeHtml(v.customText)}</p>`; card.appendChild(rnode);
+  } else if(layout==='mono'){
+    const mn = document.createElement('div'); mn.className='mono'; mn.style.marginTop='18px'; mn.innerHTML=`<p style='color:${v.fg}'>${escapeHtml(v.customText)}</p>`; card.appendChild(mn);
+  } else if(layout==='menu-left'){
+    const container = document.createElement('div'); container.style.display='flex'; container.style.gap='12px'; const menu = document.createElement('div'); menu.style.width='180px'; menu.style.background='rgba(255,255,255,0.03)'; menu.style.padding='12px'; menu.innerHTML=`<strong style='color:${v.fg}'>menu</strong><div style='margin-top:8px;font-size:13px;opacity:.8'>item 1<br/>item 2</div>`; const content = document.createElement('div'); content.style.flex='1'; content.innerHTML=`<p style='color:${v.fg}'>${escapeHtml(v.customText)}</p>`; container.appendChild(menu); container.appendChild(content); card.appendChild(container);
+  } else if(layout==='hidden-controls'){
+    // hide control buttons
+    hideControls(); const hc = document.createElement('div'); hc.style.marginTop='18px'; hc.innerHTML=`<p style='color:${v.fg}'>${escapeHtml(v.customText)}</p><p class='smallfoot'>controls hidden</p>`; card.appendChild(hc);
+  } else if(layout==='overlay'){
+    const ov = document.createElement('div'); ov.style.marginTop='18px'; ov.innerHTML=`<div style='position:relative'><div style='position:absolute;inset:0;background:linear-gradient(180deg, ${v.accent}22, transparent);border-radius:12px'></div><div style='position:relative;padding:18px;color:${v.fg}'>${escapeHtml(v.customText)}</div></div>`; card.appendChild(ov);
+  } else if(layout==='no-card'){
+    // handled above
+  } else if(layout==='bombastic'){
+    const b = document.createElement('div'); b.style.marginTop='18px'; b.innerHTML=`<h2 style='color:${v.fg}'>BOOM</h2><p>${escapeHtml(v.customText)}</p><div style='height:120px;background:radial-gradient(circle at center, ${v.accent}, rgba(0,0,0,0.08))'></div>`; card.appendChild(b);
+  } else {
     const fallback = document.createElement('div'); fallback.style.marginTop='18px'; fallback.innerHTML=`<p style='color:${v.fg}'>${escapeHtml(v.customText)}</p>`; card.appendChild(fallback);
   }
 
-  // footer small
+  // footer
   const ft = document.createElement('div'); ft.style.marginTop='18px'; ft.innerHTML = `<a class='small' href='#' style='color:${v.fg}'>made with ♡ — reload to switch — category: ${v.category}</a>`; card.appendChild(ft);
 
-  // animated background svg
-  const bgEl = document.getElementById('bg'); bgEl.innerHTML = generateBgSVG(v);
+  // background SVG
+  generateBgSVGInto('bg', v);
 
-  // some variants tweak global styles for flavor
-  if(v.category==='sexy'){
-    // slightly higher opacity, softer bg
-    bgEl.style.opacity = 0.34;
-    card.style.border = '1px solid rgba(255,255,255,0.02)';
-  } else if(v.category==='creepy'){
-    bgEl.style.opacity = 0.5;
-    card.style.boxShadow = '0 20px 60px rgba(0,0,0,.6)';
-  } else { bgEl.style.opacity = 0.28; }
+  // per-variant global tweaks
+  applyModifiersToControls(v);
+  applyFontVariant(v);
+}
+
+function applyModifiersToControls(v){
+  const controls = document.querySelector('.controls');
+  if(v.modifiers.hideControls) controls.style.display='none'; else controls.style.display='flex';
+  if(v.modifiers.flip) controls.style.transform = 'scaleX(-1)'; else controls.style.transform = 'none';
+}
+
+function applyFontVariant(v){
+  const root = document.getElementById('root');
+  root.classList.remove('mono');
+  if(v.modifiers.fontVariant==='mono') root.classList.add('mono');
+}
+
+function hideControls(){ document.querySelector('.controls').style.display='none'; }
+
+function generateBgSVGInto(elId, v){
+  const el = document.getElementById(elId);
+  el.innerHTML = generateBgSVG(v);
+  // tweak opacity based on category
+  if(v.category==='sexy') el.style.opacity = 0.38;
+  else if(v.category==='creepy') el.style.opacity = 0.6;
+  else el.style.opacity = 0.28;
 }
 
 function generateBgSVG(v){
   const accent = v.accent;
-  // some variety in the path using id
   return `
-  <svg viewBox="0 0 800 600" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+  <svg viewBox="0 0 1200 800" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
     <defs>
       <linearGradient id="g${v.id}" x1="0" x2="1"><stop offset="0" stop-color="${accent}"/><stop offset="1" stop-color="${v.fg}" stop-opacity=".12"/></linearGradient>
-      <filter id="f${v.id}" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="${20 + (v.id % 40)}"/></filter>
+      <filter id="f${v.id}" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="${10 + (v.id % 80)}"/></filter>
     </defs>
     <rect width="100%" height="100%" fill="${v.bg}"/>
     <g filter="url(#f${v.id})">
-      <path d="M0 300 C150 ${200 + v.id}, 350 ${420 - (v.id%80)}, 800 300 L800 600 L0 600 Z" fill="url(#g${v.id})" opacity=".7"></path>
-      <circle cx="${(v.id*23)%800}" cy="${80 + (v.id%120)}" r="${40 + (v.id%70)}" fill="${accent}" opacity=".06"></circle>
-      <circle cx="${700 - (v.id*7%400)}" cy="${500 - (v.id%180)}" r="${60 + (v.id%60)}" fill="${v.fg}" opacity=".02"></circle>
+      <path d="M0 320 C200 ${150 + v.id}, 460 ${420 - (v.id%120)}, 1200 320 L1200 800 L0 800 Z" fill="url(#g${v.id})" opacity=".7"></path>
+      <circle cx="${(v.id*37)%1200}" cy="${60 + (v.id%160)}" r="${30 + (v.id%90)}" fill="${accent}" opacity=".06"></circle>
+      <circle cx="${1000 - (v.id*9%700)}" cy="${600 - (v.id%240)}" r="${80 + (v.id%80)}" fill="${v.fg}" opacity=".02"></circle>
     </g>
   </svg>`;
 }
@@ -234,31 +312,20 @@ function pickVariant(){
   const url = new URL(location.href);
   const vp = url.searchParams.get('v');
   let idx = parseInt(vp);
-  if(!Number.isFinite(idx) || isNaN(idx) || idx<1 || idx>variants.length){
-    idx = Math.floor(Math.random()*variants.length)+1;
-  }
+  if(!Number.isFinite(idx) || isNaN(idx) || idx<1 || idx>variants.length){ idx = Math.floor(Math.random()*variants.length)+1; }
   return variants[idx-1];
 }
 
-// bind controls
+// controls
 document.getElementById('reroll').addEventListener('click', ()=>{ location.reload(); });
-document.getElementById('randomName').addEventListener('click', ()=>{
-  const v = pickVariant();
-  const key = btoa(String(Date.now()+":"+v.id)).replace(/=/g,'');
-  const newUrl = location.origin + location.pathname + '?v=' + v.id + '&r=' + key;
-  navigator.clipboard.writeText(newUrl).then(()=> alert('Link copiado: ' + newUrl)).catch(()=> prompt('Copiar link (manual):', newUrl));
-});
+document.getElementById('randomName').addEventListener('click', ()=>{ const v = pickVariant(); const key = btoa(String(Date.now()+":"+v.id)).replace(/=/g,''); const newUrl = location.origin + location.pathname + '?v=' + v.id + '&r=' + key; navigator.clipboard.writeText(newUrl).then(()=> alert('Link copiado: ' + newUrl)).catch(()=> prompt('Copiar link (manual):', newUrl)); });
+document.getElementById('listBtn').addEventListener('click', ()=>{ console.table(variants.map(v=>({id:v.id,title:v.title,category:v.category,layout:v.layout}))); alert('Lista de variants enviada ao console.'); });
 
-// console list button for quick previews
-document.getElementById('listBtn').addEventListener('click', ()=>{
-  console.table(variants.map(v=>({id:v.id,title:v.title,category:v.category,layout:v.layout}))); alert('Lista de variants enviada ao console.');
-});
+let debug=false; document.getElementById('debugToggle').addEventListener('click', ()=>{ debug=!debug; alert('debug: '+debug); console.log('variants count', variants.length); });
 
 // init
 const current = pickVariant();
 applyVariant(current);
-
-// expose for debugging
 window.__variants = variants;
 </script>
 </body>
