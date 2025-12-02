@@ -11,109 +11,105 @@
     }
     .container {
         padding: 30px;
+        transition: all 0.3s;
     }
     input, button {
         padding: 10px;
         font-size: 16px;
+        margin-top: 10px;
     }
 </style>
 </head>
 <body>
-
 <div id="app"></div>
 
 <script>
-    // LISTA DE VARIANTS
-    const variants = [
-        function CHAT() {
-            document.body.style.background = "#111";
-            document.body.style.color = "#0f0";
-            return `
-                <div class="container">
-                    <h1>💬 Variant: Chat Terminal</h1>
-                    <p>Digite algo e receba uma palavra aleatória.</p>
-                    <input id="userInput" placeholder="Digite aqui...">
-                    <button onclick="send()">Enviar</button>
-                    <p id="result"></p>
-                </div>
-            `;
-        },
+const funnyTexts = [
+    "cara q tedio.", "bro sla", "quero sair daq pls", "kkk serio?", "na moral...", 
+    "wtf bro", "isso é hilario", "mano, socorro", "ta loko?", "rip minha vida", 
+    "so um minutinho pls", "oquei...", "bem estranho isso", "aff q saco", 
+    "lol q aleatorio", "pq n?", "ai meu deus", "tenso isso", "que viagem", 
+    "meh", "fudeu", "kkkkk", "wtf real", "vlw mano", "so q rindo"
+];
 
-        function JOGOS() {
-            document.body.style.background = "#0a0a2a";
-            document.body.style.color = "#7af";
-            return `
-                <div class="container">
-                    <h1>🎮 Variant: Mini Jogos</h1>
-                    <p>Este não é bem um jogo... mas finge que é!</p>
-                    <input id="userInput" placeholder="Digite algo...">
-                    <button onclick="send()">Enviar</button>
-                    <p id="result"></p>
-                </div>
-            `;
-        },
+const sexyTexts = [
+    "hum, olha só...", "vc ta de boa?", "hmmm", "só observando...", 
+    "vibe intensa", "so sexy", "pq n testar?", "ai ai", "quer ver?", "bro pls", 
+    "ta quente aq", "hehehe", "confesso q...", "quero mais", "so vibes", 
+    "se liga", "top demais", "so pra ti", "hahaha...", "realmente...", 
+    "oi oi", "so olhando msm", "bro kkk", "slk q vibes", "vibe loka"
+];
 
-        function BLOG() {
-            document.body.style.background = "#fff7e6";
-            document.body.style.color = "#444";
-            return `
-                <div class="container">
-                    <h1>📝 Variant: Blog</h1>
-                    <p>Bem-vindo ao blog aleatório do nada absoluto.</p>
-                    <input id="userInput" placeholder="Escreva algo no blog...">
-                    <button onclick="send()">Enviar</button>
-                    <p id="result"></p>
-                </div>
-            `;
-        },
+const creepyTexts = [
+    "voce me viu?", "ta sozinho?", "nao desligue...", "sigo vc", "escuto td", 
+    "tem alguem aq", "nao olhe atras", "segue silencioso", "q som foi aquele?", 
+    "soh um teste", "vc lembra de mim?", "ta frio aq", "algo te observa", 
+    "nao respire", "sussurros...", "cara, medo", "shhh", "n tao seguro", 
+    "vem comigo", "ta me ouvindo?", "isso n é normal", "ninguém sabe", 
+    "soh eu sei", "oq sente?", "tá sentindo isso?", "final chegando"
+];
 
-        function ERRO404() {
-            document.body.style.background = "#200";
-            document.body.style.color = "#faa";
-            return `
-                <div class="container">
-                    <h1>❌ Variant: Erro 404</h1>
-                    <p>Essa página não existe. Talvez.</p>
-                    <input id="userInput" placeholder="Digite algo proibido...">
-                    <button onclick="send()">Enviar</button>
-                    <p id="result"></p>
-                </div>
-            `;
-        },
+const secretTexts = [
+    "algo estranho aq", "parece controlado", "ninguém percebe", "mas eu sei", 
+    "novo teste online", "coisas mudam rapido", "oq vc ta vendo?", 
+    "isso parece vivo", "tudo ta conectado", "n sabe ainda", "nao diga nada", 
+    "algo mais por tras", "sistema observando", "oq n foi dito", 
+    "historias antigas", "vc percebeu?", "segredo antigo", "nova ta olhando", 
+    "não se engane", "isso muda td", "olha de novo", "ninguém fala", 
+    "coisas sumem", "como sempre", "wow final cabo", "só vc sabe"
+];
 
-        function DASHBOARD() {
-            document.body.style.background = "#001f1f";
-            document.body.style.color = "#0ff";
+// Combina todas
+const allTexts = funnyTexts.concat(sexyTexts, creepyTexts, secretTexts);
+
+const variants = [];
+
+for(let i=1; i<=100; i++){
+    variants.push({
+        id: i,
+        category: i<=25 ? "Funny" : i<=50 ? "Sexy" : i<=75 ? "Creepy" : "Secret",
+        text: allTexts[i-1],
+        generateHTML: function(){
+            // cores aleatorias
+            const bg = `hsl(${Math.random()*360}, ${40+Math.random()*60}%, ${20+Math.random()*60}%)`;
+            const color = `hsl(${Math.random()*360}, ${40+Math.random()*60}%, ${70+Math.random()*20}%)`;
+            const fontSize = 14 + Math.floor(Math.random()*16);
+            const padding = 20 + Math.floor(Math.random()*50);
+
             return `
-                <div class="container">
-                    <h1>📊 Variant: Painel Hacker</h1>
-                    <p>Sistema rodando… talvez.</p>
-                    <input id="userInput" placeholder="Envie comando...">
-                    <button onclick="send()">Enviar</button>
-                    <p id="result"></p>
-                </div>
+            <div class="container" style="
+                background: ${bg};
+                color: ${color};
+                font-size: ${fontSize}px;
+                padding: ${padding}px;
+                border-radius: ${Math.floor(Math.random()*50)}px;
+            ">
+                <h1>Variant ${this.id} (${this.category})</h1>
+                <p>${this.text}</p>
+                <input id="userInput" placeholder="Digite algo...">
+                <button onclick="send()">Enviar</button>
+                <p id="result"></p>
+            </div>
             `;
         }
-    ];
+    });
+}
 
-    // Palavras aleatórias pra resposta
-    const randomWords = [
-        "Neblina", "Trovão", "Abismo", "Luz", "Eco", "Vidro", "Marfim", 
-        "Pixel", "Estouro", "Lamento", "Fragmento", "Raiz", "Sintético"
-    ];
+// palavras aleatorias pro chat
+const randomWords = [
+    "Neblina", "Trovão", "Abismo", "Luz", "Eco", "Vidro", "Marfim", 
+    "Pixel", "Estouro", "Lamento", "Fragmento", "Raiz", "Sintético",
+    "Fragmento", "Gelo", "Fumaça", "Sombra", "Caos", "Glitch", "Vortex"
+];
 
-    // Escolhe variante aleatória
-    const variant = variants[Math.floor(Math.random() * variants.length)];
+// escolhe variant
+const variant = variants[Math.floor(Math.random()*variants.length)];
+document.getElementById("app").innerHTML = variant.generateHTML();
 
-    // Aplica a variant
-    document.getElementById("app").innerHTML = variant();
-
-    // Função de resposta
-    function send() {
-        let word = randomWords[Math.floor(Math.random() * randomWords.length)];
-        document.getElementById("result").innerText = "Resposta: " + word;
-    }
+function send(){
+    const word = randomWords[Math.floor(Math.random()*randomWords.length)];
+    document.getElementById("result").innerText = "Resposta: " + word;
+}
 </script>
-
 </body>
 </html>
