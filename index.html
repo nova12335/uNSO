@@ -3,35 +3,55 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>200 Variants — Reload para mudar</title>
+  <title>400 Variants — Reload para mudar</title>
   <style>
+    /* Variáveis CSS padrão */
     :root{--bg:#111;--fg:#eee;--accent:#ff6;--pad:32px;--card-radius:18px;--card-shadow:0 10px 30px rgba(0,0,0,.4);--glass:blur(6px)}
     html,body{height:100%;margin:0;font-family:Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;}
     .wrap{min-height:100%;display:flex;align-items:center;justify-content:center;padding:var(--pad);box-sizing:border-box;transition:all .6s ease}
     .card{max-width:1100px;width:100%;border-radius:var(--card-radius);padding:28px;box-shadow:var(--card-shadow);backdrop-filter:var(--glass);transition:all .45s ease}
     h1{margin:0 0 8px 0;font-size: clamp(20px, 4vw, 44px);letter-spacing:-0.02em}
     p.lead{margin:0 0 18px 0;font-size:clamp(14px,2.2vw,18px);opacity:.92}
+    /* Layouts e Componentes */
     .meta{display:flex;gap:12px;flex-wrap:wrap}
     .chip{padding:8px 12px;border-radius:999px;font-weight:600;background:rgba(255,255,255,.06)}
     .controls{position:fixed;right:18px;bottom:18px;display:flex;gap:10px;z-index:50}
-    button{border:0;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:700}
-    .split{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:center}
+    button{border:0;padding:10px 14px;border-radius:10px;cursor:pointer;font-weight:700;transition:transform .1s}
+    button:hover{transform:translateY(-2px)}
     .center{text-align:center}
-    .grid-tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:12px}
-    .tile{padding:18px;border-radius:12px}
     .bg-wave{position:fixed;inset:0;z-index:-1;opacity:.28}
     svg{display:block;width:100%;height:100%}
     .logo{font-weight:900;letter-spacing:-.02em}
     a.small{font-size:13px;opacity:.9}
-    @media (max-width:720px){.split{grid-template-columns:1fr}}
-    .glitch{position:relative}
-    .glitch::before,.glitch::after{content:attr(data-text);position:absolute;left:0;top:0;right:0}
-    .glitch::before{transform:translateX(-2px);opacity:.6}
-    .glitch::after{transform:translateX(2px);opacity:.6}
-    .reverse{direction:rtl}
+    /* Modificadores */
     .mono{font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', 'Courier New', monospace}
-    .big{font-size: clamp(18px, 3.6vw, 38px)}
-    .smallfoot{font-size:12px;opacity:.7}
+    /* Estilo para a área de input que estará sempre visível */
+    .chat-container {
+        display: flex;
+        align-items: center;
+        margin-top: 15px; /* Novo espaçamento */
+        margin-bottom: 25px; /* Novo espaçamento */
+        gap: 8px;
+    }
+    .chat-input {
+        flex-grow: 1;
+        padding: 10px 15px;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: rgba(0, 0, 0, 0.2);
+        color: var(--fg);
+    }
+    .nova-response {
+        margin-top: 8px;
+        color: var(--accent);
+        font-weight: 600;
+        font-size: 14px;
+        padding: 5px 0;
+        border-top: 1px dashed rgba(255, 255, 255, 0.1);
+    }
+    .scary-glow {
+        filter: drop-shadow(0 0 4px var(--accent)) drop-shadow(0 0 10px var(--accent));
+    }
   </style>
 </head>
 <body>
@@ -48,17 +68,19 @@
   </div>
 
 <script>
+const TOTAL_VARIANTS = 400; // Alterado de 200 para 400
 const palettes = [['#0f172a','#e6edf3','#7c3aed'],['#07121a','#e8fff7','#06b6d4'],['#1a1a1a','#ffeedd','#ff6b6b'],['#08120f','#dff6e9','#22c55e'],['#0b1020','#e6e9ff','#8b5cf6'],['#0f0503','#fff4e6','#ffb020'],['#041224','#e8f6ff','#06b6d4'],['#100d14','#f8eefc','#d946ef'],['#0a0f0a','#f3fff5','#10b981'],['#0f0722','#fff0f6','#fb7185']];
 const emojis = ['✨','⚡','🔥','🌊','🎛️','🖤','🪐','🎇','💥','🔮','🌙','🍷','🥀','😈','👀','💋','🧠','👻','🕯️','🔪','🪩','🎭','🩸','🧿','🦇'];
 
-const sexyTexts = ['texto sensual: *passa a mão no código*','a noite é nossa — e o reload também','não é só o site que aquece... cuidado','sussurros de CSS e promessas de hover','abraçe o brilho, puxe a tela mais perto','chega mais perto... o layout tá chamando','você sempre volta, né? adoro isso'];
-const creepyTexts = ['eu sinto q tem alguém me observando','não leia isso à noite','ela veio quando ninguém notou...','porta fechada. luz acesa. silêncio','se você chegou até aqui, não volte','tem algo atrás de você... acho','você ouviu isso? eu ouvi'];
-const randomTexts = ['texto randômico 291817','vc caiu no bait do reload kkk','eu gosto de café e reloads','isso daqui n era pra existir','variant cursed real','alguém deixou isso aqui? n fui eu','tô sem ideia mas o site pediu pra escrever'];
-const funnyTexts = ['carai mano tu recarregou memo???','oxe esse é outro texto aleatório kkk','se recarregar dnv eu choro','vc n cansa não?','reload é meu esporte favorito','mano para de clicar já tá tarde','eu? repetitivo? olha outra vez então'];
-const misteryTexts = ['isso aqui NÃO é um ARG… ou será?','vc desbloqueou o nivel secreto (mentira)','texto misterioso #39','bloxfall é real eu vi','ed garden n teria aprovado isso','ele disse q ia voltar…','tem algo errado com essa variant'];
-const poeticTexts = ['no silêncio do reload nasce um novo verso','pixels perguntam, a lua responde','este site coleciona pequenas despedidas','o vento passa e rearranja classes','um suspiro de CSS entre as sombras','há poesia até no erro 404','telas mudam, você fica'];
-const playerTexts = ['Ei, você aí! Sim, você que recarrega sem parar...','Não acha que já é hora de explorar algo novo?','Olha, o site sabe o que você fez ontem, hehe.','Cuidado! Cada clique muda mais do que você imagina.','Ah, você voltou... estava sentindo sua falta!','Recarregando assim, você vai descobrir segredos...','Shhh... isso é só entre nós, ok?'];
-const novaAITexts = ['Ola, sou Nova.','Eu posso ajudar você a navegar pelas variants.','Cada reload é uma nova surpresa comigo.','Quer que eu conte um segredo do site?'];
+// Textos Revisados
+const sexyTexts = ['texto sensual: *passa a mão no código*','a noite é nossa — e o reload também','não é só o site que aquece... cuidado','sussurros de CSS e promessas de hover','chega mais perto... o layout tá chamando','você sempre volta, né? adoro isso'];
+const creepyTexts = ['eu sinto q tem alguém me observando','não leia isso à noite','porta fechada. luz acesa. silêncio','tem algo atrás de você... acho','você ouviu isso? eu ouvi','fique... não vá embora...'];
+const randomTexts = ['texto randômico 291817','eu gosto de café e reloads','isso daqui n era pra existir','variant cursed real','tô sem ideia mas o site pediu pra escrever','mais um dia, mais um reload'];
+const funnyTexts = ['carai mano tu recarregou memo???','oxe esse é outro texto aleatório kkk','se recarregar dnv eu choro','reload é meu esporte favorito','mano para de clicar já tá tarde','eu? repetitivo? olha outra vez então'];
+const misteryTexts = ['isso aqui NÃO é um ARG… ou será?','vc desbloqueou o nivel secreto (mentira)','texto misterioso #39','ele disse q ia voltar…','tem algo errado com essa variant'];
+const poeticTexts = ['no silêncio do reload nasce um novo verso','pixels perguntam, a lua responde','este site coleciona pequenas despedidas','o vento passa e rearranja classes','telas mudam, você fica'];
+const playerTexts = ['Ei, você aí!','Não acha que já é hora de explorar algo novo?','O site sabe o que você fez ontem, hehe.','Ah, você voltou... estava sentindo sua falta!','Recarregando assim, você vai descobrir segredos...'];
+const novaAITexts = ['Ola, sou Nova.','Eu posso ajudar você a navegar pelas variants.','Cada reload é uma nova surpresa comigo.','Quer que eu conte um segredo do site?','Eu vejo o que você digita...'];
 
 const subtitles = ['um experimento que muda a cada recarga','aleatório. diferente. só recarrega.','reload to see something different','feito pra confundir e encantar','cada variant reescreve o site'];
 const layoutPool = ['center','split','tiles','big-header','minimal','fullscreen','glitch','broken','fire-bg','rtl','mono','giant','overlay','split-visual','menu-left','hidden-controls','no-card','gradient-grid','bombastic'];
@@ -66,18 +88,19 @@ const layoutPool = ['center','split','tiles','big-header','minimal','fullscreen'
 function pick(arr,i){ return arr[i % arr.length]; }
 function randInt(max){ return Math.floor(Math.random()*max); }
 function escapeHtml(unsafe){ if(!unsafe) return ''; return unsafe.replace(/[&<>"]|'/g, function(m){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#039;"}[m];}); }
-function truncate(str,n){ if(!str) return ''; return (str.length>n)?str.slice(0,n-1)+'…':str; }
 
 const variants = [];
-for(let i=0;i<200;i++){
+for(let i=0;i<TOTAL_VARIANTS;i++){
   const p = palettes[i % palettes.length];
   const bg = p[0], fg = p[1], accent = p[2];
   let category;
+
+  // Lógica de Categoria Ajustada para mais variedade
   if(i % 11 === 2) category = 'sexy';
-  else if(i % 7 === 3) category = 'creepy';
+  else if(i % 7 === 3 || i % 13 === 0) category = 'creepy'; // Aumenta a chance de Creepy
   else if(i % 5 === 2) category = 'mistery';
   else if(i % 3 === 0) category = 'funny';
-  else if(i % 13 === 4) category = 'poetic';
+  else if(i % 17 === 4) category = 'poetic';
   else category = 'random';
 
   let customText;
@@ -93,7 +116,15 @@ for(let i=0;i<200;i++){
   const title = `${pick(emojis,i)} Flux ${i+1}`;
   const subtitle = pick(subtitles,i);
   const layout = pick(layoutPool,i);
-  const modifiers = { fontVariant: (i%6===0)?'mono':(i%5===0)?'serif':'system', radius: 8 + (i%30), pad: 16 + (i%40), hideControls: (i%17===0), flip: (i%19===0), bigHeader: (i%23===0) };
+  const modifiers = { 
+        fontVariant: (i%6===0)?'mono':(i%5===0)?'serif':'system', 
+        radius: 8 + (i%30), 
+        pad: 16 + (i%40), 
+        hideControls: (i%17===0), 
+        flip: (i%19===0), 
+        bigHeader: (i%23===0),
+        scaryEffect: (category === 'creepy' && i % 4 === 1) // Efeito visual extra para Creepy
+    };
   variants.push({ id:i+1, title, subtitle, bg, fg, accent, layout, accentEmoji: pick(emojis,i), customText, category, modifiers });
 }
 
@@ -103,7 +134,7 @@ function applyVariant(v){
   document.documentElement.style.setProperty('--accent', v.accent);
   document.documentElement.style.setProperty('--pad', v.modifiers.pad + 'px');
   document.documentElement.style.setProperty('--card-radius', v.modifiers.radius + 'px');
-  document.documentElement.style.setProperty('--card-shadow', (v.category==='creepy')? '0 30px 90px rgba(0,0,0,.7)' : '0 10px 30px rgba(0,0,0,.35)');
+  document.documentElement.style.setProperty('--card-shadow', (v.category==='creepy')? '0 30px 90px rgba(255,0,0,.5)' : '0 10px 30px rgba(0,0,0,.35)'); // Sombra vermelha para Creepy
   document.documentElement.style.setProperty('--glass', (v.category==='sexy')? 'blur(8px)' : 'blur(6px)');
   document.body.style.background = v.bg;
   const card = document.getElementById('card');
@@ -115,29 +146,67 @@ function applyVariant(v){
   const h = document.createElement('div'); h.style.display='flex'; h.style.justifyContent='space-between'; h.style.alignItems='center';
   if(v.modifiers.flip) h.style.flexDirection = 'row-reverse';
   const left = document.createElement('div');
-  const titleEl = document.createElement('h1'); titleEl.className='logo'; titleEl.textContent=`${v.accentEmoji} ${v.title}`; titleEl.style.color = v.fg; if(v.modifiers.bigHeader) titleEl.classList.add('big'); left.appendChild(titleEl);
+  const titleEl = document.createElement('h1'); titleEl.className='logo'; 
+  titleEl.textContent=`${v.accentEmoji} ${v.title}`; 
+  titleEl.style.color = v.fg; 
+  if(v.modifiers.bigHeader) titleEl.classList.add('big'); 
+  if(v.modifiers.scaryEffect) titleEl.classList.add('scary-glow'); // Aplica efeito scary
+  left.appendChild(titleEl);
+
   const sub = document.createElement('p'); sub.className='lead'; sub.textContent = v.subtitle; sub.style.color = v.fg; left.appendChild(sub);
   h.appendChild(left);
+  
   const right = document.createElement('div'); right.className='meta';
-  const chip = document.createElement('div'); chip.className='chip'; chip.textContent = `Variant ${v.id}/200`; chip.style.color = v.bg; chip.style.background = v.accent; right.appendChild(chip);
+  const chip = document.createElement('div'); chip.className='chip'; chip.textContent = `Variant ${v.id}/${TOTAL_VARIANTS}`; chip.style.color = v.bg; chip.style.background = v.accent; right.appendChild(chip);
   h.appendChild(right);
   card.appendChild(h);
 
-  const c = document.createElement('div'); c.className='center'; c.style.marginTop='22px';
-  const big = document.createElement('p'); big.textContent = v.customText; big.style.fontSize='18px'; big.style.color=v.fg; c.appendChild(big);
+  // --- Área de Input MIGRADA PARA O TOPO ---
+  const chatContainer = document.createElement('div');
+  chatContainer.className = 'chat-container';
+  
+  const input = document.createElement('input'); 
+  input.placeholder='Converse com Nova (diga "nova")...'; 
+  input.className = 'chat-input';
 
-  const input = document.createElement('input'); input.placeholder='Digite algo...'; input.style.marginTop='12px'; input.style.padding='8px 12px'; input.style.borderRadius='8px'; input.style.border='none'; input.style.width='60%';
-  const sendBtn = document.createElement('button'); sendBtn.textContent='Enviar'; sendBtn.style.marginLeft='8px'; sendBtn.onclick = ()=>{
+  const sendBtn = document.createElement('button'); 
+  sendBtn.textContent='Enviar'; 
+  sendBtn.style.color = v.bg; 
+  sendBtn.style.background = v.accent; 
+  sendBtn.onclick = ()=>{
     const msg = input.value.toLowerCase();
     if(msg.includes('nova')){
+      const responseContainer = document.getElementById('novaResponses');
+      responseContainer.innerHTML = ''; // Limpa respostas antigas
+
       novaAITexts.forEach(txt=>{
-        const response = document.createElement('p'); response.style.marginTop='8px'; response.style.color=v.accent; response.textContent = txt;
-        c.appendChild(response);
+        const response = document.createElement('p'); 
+        response.className = 'nova-response'; 
+        response.textContent = `[NOVA] ${txt}`;
+        responseContainer.appendChild(response);
       });
       input.value='';
-    }
+    } else if (msg.length > 5) {
+        // Resposta neutra para qualquer outra coisa
+        const responseContainer = document.getElementById('novaResponses');
+        responseContainer.innerHTML = ''; 
+        const response = document.createElement('p'); 
+        response.className = 'nova-response'; 
+        response.textContent = `[NOVA] Interessante, mas só respondo se me chamarem.`;
+        responseContainer.appendChild(response);
+    }
   };
-  c.appendChild(input); c.appendChild(sendBtn);
+  chatContainer.appendChild(input); 
+  chatContainer.appendChild(sendBtn);
+  card.appendChild(chatContainer);
+
+  const responseContainer = document.createElement('div');
+  responseContainer.id = 'novaResponses';
+  card.appendChild(responseContainer);
+  // --- Fim da Área de Input MIGRADA ---
+
+  const c = document.createElement('div'); c.className='center'; c.style.marginTop='22px';
+  const big = document.createElement('p'); big.textContent = v.customText; big.style.fontSize='18px'; big.style.color=v.fg; c.appendChild(big);
   card.appendChild(c);
 
   const ft = document.createElement('div'); ft.style.marginTop='18px'; ft.innerHTML = `<a class='small' href='#' style='color:${v.fg}'>made with ♡ — reload to switch — category: ${v.category}</a>`; card.appendChild(ft);
@@ -162,17 +231,15 @@ document.getElementById('randomName').addEventListener('click', ()=>{
 });
 
 document.getElementById('listBtn').addEventListener('click', ()=>{
-    console.log('--- 200 Variants List ---');
+    console.log(`--- ${TOTAL_VARIANTS} Variants List ---`);
     console.table(variants.map(v => ({
         ID: v.id,
         Title: v.title,
         Category: v.category,
-        Layout: v.layout,
         BG: v.bg,
-        FG: v.fg,
         Accent: v.accent
     })));
-    alert('A lista de 200 variants foi impressa no Console (F12).');
+    alert(`A lista de ${TOTAL_VARIANTS} variants foi impressa no Console (F12).`);
 });
 
 document.getElementById('debugToggle').addEventListener('click', ()=>{
