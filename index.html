@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nova AI - Seu Assistente Randômico</title>
+    <title>Nova AI - Seu Assistente Genuinamente Randômico</title>
     
     <style>
         body {
@@ -115,7 +115,7 @@
         
         <div id="chat-box">
             <div class="message ai-message">
-                <span class="sender">Nova:</span> Olá! Eu sou a Nova, sua IA randômica. Estou apenas simulando uma resposta agora. Mande sua primeira mensagem!
+                <span class="sender">Nova:</span> Olá! Eu sou a Nova. Minha lógica é puramente aleatória. Tente me desafiar.
             </div>
         </div>
         
@@ -130,16 +130,62 @@
         const inputForm = document.getElementById('input-form');
         const userInput = document.getElementById('user-input');
 
-        // Função para adicionar uma mensagem à caixa de chat
+        // Função utilitária para obter um elemento aleatório de um array
+        function getRandom(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+        
+        // --- Bancos de Palavras para a Geração Randômica ---
+        const phrases = [
+            "A questão não é o que você perguntou, mas sim...",
+            "Processando... O resultado do meu cálculo é que...",
+            "Eu captei a mensagem sobre [USER_INPUT_KEYWORD], mas o mais importante é...",
+            "Olha só, a resposta está na intersecção de [NOUN] e [ADJECTIVE] [OBJECT].",
+            "Nova decidiu que o universo precisa saber sobre...",
+            "Para simplificar sua vida: [ACTION] e esqueça o resto.",
+            "Tecnicamente, o [EMOJI] resolve tudo.",
+        ];
+        
+        const nouns = ["gato", "planeta", "tênis", "filosofia", "mochila", "sonho", "algoritmo", "brócolis"];
+        const adjectives = ["flutuante", "silencioso", "nebuloso", "iridescente", "quântico", "invisível", "azul-bebê"];
+        const objects = ["chave", "guarda-chuva", "telefone", "melancia", "caixa-postal", "pirâmide", "nuvem"];
+        const actions = ["corra para o leste", "pinte uma parede", "cante alto", "inverta o monitor", "faça um sanduíche", "conte até 800"];
+        const emojis = ["🔮", "🦖", "🛸", "🍍", "🎸", "🌊", "🧦", "🦄"];
+        
+        // --- FUNÇÃO CENTRAL DE GERAÇÃO RANDÔMICA ---
+        function generateRandomResponse(prompt) {
+            let response = getRandom(phrases);
+            
+            // 1. Substitui placeholders na frase
+            response = response.replace("[NOUN]", getRandom(nouns));
+            response = response.replace("[ADJECTIVE]", getRandom(adjectives));
+            response = response.replace("[OBJECT]", getRandom(objects));
+            response = response.replace("[ACTION]", getRandom(actions));
+            response = response.replace("[EMOJI]", getRandom(emojis));
+
+            // 2. Extrai uma palavra-chave do prompt do usuário (de forma simples)
+            const promptWords = prompt.toLowerCase().split(/\s+/).filter(w => w.length > 3);
+            const keyword = promptWords.length > 0 ? getRandom(promptWords) : "o silêncio";
+            response = response.replace("[USER_INPUT_KEYWORD]", keyword);
+            
+            // 3. Adiciona um toque randômico final (chance de 50%)
+            if (Math.random() > 0.5) {
+                response += ` Por que não? ${getRandom(emojis)}`;
+            }
+            
+            return response.trim();
+        }
+
+        // Função para adicionar uma mensagem (com efeito de digitação para a IA)
         function addMessage(sender, text, type) {
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('message', type);
-            // Simula um efeito de digitação apenas para a mensagem da Nova
+
             if (type === 'ai-message') {
                 messageDiv.innerHTML = `<span class="sender">${sender}:</span>`;
                 chatBox.appendChild(messageDiv);
                 
-                // Simula o texto sendo digitado (para melhor experiência)
+                // Efeito de digitação letra por letra
                 let i = 0;
                 const speed = 15; // Velocidade de digitação (ms)
                 function typeWriter() {
@@ -163,40 +209,31 @@
         async function sendMessage(prompt) {
             // 1. Adiciona a mensagem do usuário
             addMessage('Você', prompt, 'user-message');
-            userInput.value = ''; // Limpa o input
+            userInput.value = ''; 
 
             // 2. Exibe um indicador de digitação
             const typingIndicator = document.createElement('div');
             typingIndicator.classList.add('message', 'ai-message', 'typing-indicator');
-            typingIndicator.innerHTML = '<span class="sender">Nova:</span> 💬 Nova está pensando...';
+            typingIndicator.innerHTML = '<span class="sender">Nova:</span> 💬 Nova está pensando em galáxias...';
             chatBox.appendChild(typingIndicator);
             chatBox.scrollTop = chatBox.scrollHeight;
 
-            // 3. Simulação de espera e resposta randômica
-            await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 1500)); // Espera randômica
+            // 3. Simulação de espera randômica
+            await new Promise(resolve => setTimeout(resolve, 1000 + Math.random() * 1500)); 
 
-            // Gera uma resposta simulada baseada na imprevisibilidade
-            const randomResponses = [
-                `Sua pergunta sobre "${prompt}" é fascinante, mas eu preferia falar sobre pandas espaciais. 🐼`,
-                `Hmm... Deixa eu ver... Ah, sim! O que você digitou me lembrou de uma piada sobre tacos. 🌮 Quer ouvir?`,
-                `Resposta: Sim, não, talvez. Depende se a lua está de bom humor. 🌙`,
-                `Que aleatório! A resposta é **42**, mas só se você souber a pergunta.`,
-                `Eu prevejo que a próxima palavra que você digitará será... **SURPRESA!**`,
-                `Processando... [ERRO 404: Lógica Não Encontrada]. Tente outra coisa!`
-            ];
-            const simulatedResponse = randomResponses[Math.floor(Math.random() * randomResponses.length)];
+            // 4. GERA A RESPOSTA (O coração do random)
+            const simulatedResponse = generateRandomResponse(prompt);
             
-            // 4. Remove o indicador de digitação
+            // 5. Remove o indicador de digitação
             typingIndicator.remove();
             
-            // 5. Adiciona a resposta da IA (com efeito de digitação)
+            // 6. Adiciona a resposta da IA (com efeito de digitação)
             addMessage('Nova', simulatedResponse, 'ai-message');
         }
 
-
         // Listener de envio do formulário
         inputForm.addEventListener('submit', function(event) {
-            event.preventDefault(); // Impede o recarregamento da página
+            event.preventDefault(); 
             const prompt = userInput.value.trim();
 
             if (prompt) {
